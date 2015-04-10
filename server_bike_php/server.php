@@ -6,7 +6,7 @@
 	$email = $_POST['email'];
 	
 
-	echo 'Variavel extraidas do server PHP e nao do android: Nome: ' .$nome. '  !!!'
+	echo 'Variavel extraidas do server PHP e nao do android: Nome: ' .$nome. '  !!!';
 
 	//Classe responsável pela conexão com o banco
 	class ConectionFactory {
