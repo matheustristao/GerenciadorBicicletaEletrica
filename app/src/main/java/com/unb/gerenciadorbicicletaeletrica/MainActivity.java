@@ -33,25 +33,31 @@ public class MainActivity extends Activity {
 
         new Thread(){
             public void run(){
-                EditText nEt = (EditText) findViewById(R.id.nome);
-                EditText sEt = (EditText) findViewById(R.id.sobrenome);
-                EditText eEt = (EditText) findViewById(R.id.email);
+                EditText nomeEt = (EditText) findViewById(R.id.nome);
+                EditText sobrenomeEt = (EditText) findViewById(R.id.sobrenome);
+                EditText emailEt = (EditText) findViewById(R.id.email);
+                EditText telefoneEt = (EditText) findViewById(R.id.telefone);
+                EditText senhaEt = (EditText) findViewById(R.id.senha);
+                EditText repeatsenhatEt = (EditText) findViewById(R.id.repeat_senha);
 
-                postHttp(nEt.getText().toString(), sEt.getText().toString(), eEt.getText().toString());
+
+                postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(),senhaEt.getText().toString());
             }
         }.start();
 
     }
 
-    public void postHttp(String nome, String sobrenome, String email){
+    public void postHttp(String nome, String sobrenome, String email, String telefone, String senha){
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://192.168.0.18/server_bike/server.php");
+        HttpPost httpPost = new HttpPost("http://10.11.32.180/server_bike/server.php");
 
         try{
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
             valores.add(new BasicNameValuePair("nome", nome));
             valores.add(new BasicNameValuePair("sobrenome", sobrenome));
             valores.add(new BasicNameValuePair("email", email));
+            valores.add(new BasicNameValuePair("telefone", telefone));
+            valores.add(new BasicNameValuePair("senha", senha));
 
             httpPost.setEntity(new UrlEncodedFormEntity(valores));
             final HttpResponse resposta = httpClient.execute(httpPost);

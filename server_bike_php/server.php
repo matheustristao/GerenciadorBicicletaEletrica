@@ -1,15 +1,21 @@
 <?php
 
-	
-	$nome = $_POST['nome'];
-	$sobrenome = $_POST['sobrenome'];
-	$email = $_POST['email'];
-	
+    
+    $nome = $_POST['nome'];
+    $sobrenome = $_POST['sobrenome'];
+    $email = $_POST['email'];
+    $telefone = $_POST['telefone'];
+    $senha_usuario = $_POST['senha'];
+    
 
-	echo 'Variavel extraidas do server PHP e nao do android: Nome: ' .$nome. '  !!!';
+    //echo 'Variavel extraidas do server PHP e nao do android: Nome: ' .$nome. '  !!!';
 
-	//Classe responsável pela conexão com o banco
-	class ConectionFactory {
+    $userDao = new UsuarioDao();
+    
+    $userDao->saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario);
+
+    //Classe responsável pela conexão com o banco
+    class ConectionFactory {
 
     static protected $mysqli;
     
@@ -17,11 +23,11 @@
         $MySQL = array(
             'servidor' => 'localhost',
             'usuario' => 'root',
-            'senha' => 'root',
+            'senha_banco' => 'root',
             'banco' => 'server_bike'
         );
 
-        $mysqli = new mysqli($MySQL['servidor'], $MySQL['usuario'], $MySQL['senha'], $MySQL['banco']);
+        $mysqli = new mysqli($MySQL['servidor'], $MySQL['usuario'], $MySQL['senha_banco'], $MySQL['banco']);
 
         if (mysqli_connect_errno()) {
             trigger_error(mysqli_connect_error(), E_USER_ERROR);
@@ -42,10 +48,10 @@
         return $result = $instanciaMySqli->query($query);
     }
 
-	}
+    }
 
-	//Classe responsável pelo cadastro de usuários no banco
-	class UsuarioDao {
+    //Classe responsável pelo cadastro de usuários no banco
+    class UsuarioDao {
 
     static private $conection;
 
@@ -58,37 +64,45 @@
         return self::$conection;
     }
 
-    public function listUsuario($nome,$sobrenome) {
+    public function listUsuario($nome,$sobrenome, $telefone, $email) {
 
         $instanciaConection = self::instanciaConection();
 
         $query = "select 
             P.NOME,
             P.SOBRENOME,
-            P.EMAIL
+            P.EMAIL,
+            P.TELEFONE 
                 from  usuario P
                 where 
-                	P.NOME like '$nome'
-                	and
-                	P.SOBRENOME like '$sobrenome' 
+                    P.NOME like '$nome'
+                    and
+                    P.SOBRENOME like '$sobrenome' 
                 ";
 
         return $lista = $instanciaConection->listData($query);
     }
 
-    public function saveUsuario($nome, $sobrenome, $email) {
+    public function saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario) {
+
+        echo $telefone;
+
 
         $instanciaConection = self::instanciaConection();
 
-        $query1 = "insert into usuario (
+        $query1 = "insert into USUARIO (
                      NOME
                     ,SOBRENOME
                     ,EMAIL
+                    ,TELEFONE
+                    ,SENHA
                     ) VALUES ( 
-                     '$nome' -- NOME - IN varchar(40)
-                    ,'$sobrenome' -- SOBRENOME - IN varchar(100)
-                    ,'$email' -- EMAIL - IN varchar(100)
-                    ) ";
+                     '$nome' 
+                    ,'$sobrenome' 
+                    ,'$email'
+                    ,'$telefone'
+                    ,'$senha_usuario' 
+                    );";
 
         $instanciaConection->executaQuery($query1);
             

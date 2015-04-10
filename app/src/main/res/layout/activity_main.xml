@@ -40,6 +40,31 @@
         android:inputType="textEmailAddress"
         android:hint="*Email" />
 
+    <EditText
+        android:id="@+id/telefone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="*Telefone" />
+
+
+    <EditText
+        android:id="@+id/senha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="*SENHA" />
+
+    <EditText
+        android:id="@+id/repeat_senha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="*CONFIRMAÇÃO DE SENHA" />
+
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
