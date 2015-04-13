@@ -40,16 +40,25 @@ public class MainActivity extends Activity {
                 EditText senhaEt = (EditText) findViewById(R.id.senha);
                 EditText repeatsenhatEt = (EditText) findViewById(R.id.repeat_senha);
 
+                if(senhaEt.getText().toString().equals(repeatsenhatEt.getText().toString())){
+                    postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(),senhaEt.getText().toString());
+                }
+                else {
+                    MainActivity.this.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Senhas não batem. Digite novamente", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                }
 
-                postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(),senhaEt.getText().toString());
-            }
         }.start();
 
     }
 
     public void postHttp(String nome, String sobrenome, String email, String telefone, String senha){
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://10.11.32.180/server_bike/server.php");
+        HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
 
         try{
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();

@@ -85,7 +85,7 @@
 
     public function saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario) {
 
-        echo $telefone;
+        echo "Dados recebidos e salvos no servidor";
 
 
         $instanciaConection = self::instanciaConection();
