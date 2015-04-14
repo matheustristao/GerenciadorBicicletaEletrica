@@ -57,7 +57,9 @@ public class CadastroActivity extends Activity {
 
     public void postHttp(String nome, String sobrenome, String email, String telefone, String senha){
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
+        //HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
+        // server Pedro
+        HttpPost httpPost = new HttpPost("http://192.168.56.101/server.php");
 
         try{
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
