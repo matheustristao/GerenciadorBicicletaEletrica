@@ -16,12 +16,11 @@ import org.apache.http.util.EntityUtils;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class Cadastro extends Activity {
+public class CadastroActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +43,9 @@ public class Cadastro extends Activity {
                     postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(),senhaEt.getText().toString());
                 }
                 else {
-                    Cadastro.this.runOnUiThread(new Runnable() {
+                    CadastroActivity.this.runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(Cadastro.this, "Senhas não batem. Digite novamente", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CadastroActivity.this, "Senhas não batem. Digite novamente", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

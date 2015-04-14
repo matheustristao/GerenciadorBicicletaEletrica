@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Cadastro"
+            android:name=".CadastroActivity"
             android:label="@string/title_activity_cadastro" >
         </activity>
     </application>
