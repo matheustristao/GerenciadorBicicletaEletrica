@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
         Button btNovoUsuario;
 
         btNovoUsuario = (Button) findViewById(R.id.btNovoUsuario);
-
+//comment
         btNovoUsuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
