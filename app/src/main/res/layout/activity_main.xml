@@ -32,7 +32,7 @@
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number"
+                android:inputType="text"
                 android:layout_span="3"
                 android:ems="10"
                 android:id="@+id/etEmail"
