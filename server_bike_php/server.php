@@ -1,18 +1,30 @@
 <?php
 
-    
-    $nome = $_POST['nome'];
-    $sobrenome = $_POST['sobrenome'];
-    $email = $_POST['email'];
-    $telefone = $_POST['telefone'];
-    $senha_usuario = $_POST['senha'];
+
+    $numero_funcao = $_POST['numerofuncao'];
     
 
-    //echo 'Variavel extraidas do server PHP e nao do android: Nome: ' .$nome. '  !!!';
+    //echo 'Numero funcao: ' .$numero_funcao. '  !!!';
 
     $userDao = new UsuarioDao();
-    
-    $userDao->saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario);
+
+    switch ($numero_funcao) {
+    case "1":
+        $nome = $_POST['nome'];
+        $sobrenome = $_POST['sobrenome'];
+        $email = $_POST['email'];
+        $telefone = $_POST['telefone'];
+        $senha_usuario = $_POST['senha'];
+
+        $userDao->saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario);
+        break;
+    case "2":
+        $email = $_POST['email'];
+        $senha_usuario = $_POST['senha'];    
+
+        $userDao->checkLogin($email, $senha_usuario);
+        break;
+}
 
     //Classe responsável pela conexão com o banco
     class ConectionFactory {
@@ -64,6 +76,36 @@
         return self::$conection;
     }
 
+
+
+    public function checkLogin($email, $senha_usuario) {
+
+        $instanciaConection = self::instanciaConection();
+
+        $query = "select 
+                1 
+                from  USUARIO P
+                where 
+                    P.EMAIL like '$email'
+                    and
+                    P.SENHA like '$senha_usuario' 
+                ";
+
+         $result = $instanciaConection->listData($query);
+         
+         $contagem = $result->num_rows;  
+
+         //echo $result;      
+
+        if ($contagem > 0) {
+            echo "loguei";
+            return 1;
+        } else {
+            echo "naologuei";
+            return 0;
+        }
+    }
+
     public function listUsuario($nome,$sobrenome, $telefone, $email) {
 
         $instanciaConection = self::instanciaConection();
@@ -82,6 +124,8 @@
 
         return $lista = $instanciaConection->listData($query);
     }
+
+
 
     public function saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario) {
 

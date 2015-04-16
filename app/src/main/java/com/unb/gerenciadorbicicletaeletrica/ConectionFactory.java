@@ -1,12 +1,9 @@
 package com.unb.gerenciadorbicicletaeletrica;
 
 
-import android.app.Activity;
-import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -24,9 +21,16 @@ import java.util.ArrayList;
 public class ConectionFactory {
 
 
-    private String mensagem;
+    private String mensagem_cadastro;
+
+    private String mensagem_login;
+
+    private String numero_funcao;
 
     public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
+
+        numero_funcao = "1";
+
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
         try{
@@ -36,10 +40,13 @@ public class ConectionFactory {
             valores.add(new BasicNameValuePair("email", email));
             valores.add(new BasicNameValuePair("telefone", telefone));
             valores.add(new BasicNameValuePair("senha", senha));
+
+            valores.add(new BasicNameValuePair("numerofuncao", numero_funcao));
+
             httpPost.setEntity(new UrlEncodedFormEntity(valores));
             final HttpResponse resposta = httpClient.execute(httpPost);
 
-            mensagem = EntityUtils.toString(resposta.getEntity());
+            mensagem_cadastro = EntityUtils.toString(resposta.getEntity());
 
 
         }
@@ -47,6 +54,33 @@ public class ConectionFactory {
         catch(ClientProtocolException e){}
         catch(IOException e){}
 
-        return mensagem;
+        return mensagem_cadastro;
+    }
+
+    public String loginHttp(String email, String senha) {
+
+        numero_funcao = "2";
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
+        try {
+            ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
+
+            valores.add(new BasicNameValuePair("email", email));
+            valores.add(new BasicNameValuePair("senha", senha));
+
+            valores.add(new BasicNameValuePair("numerofuncao", numero_funcao));
+
+            httpPost.setEntity(new UrlEncodedFormEntity(valores));
+
+            final HttpResponse resposta = httpClient.execute(httpPost);
+
+            mensagem_login = EntityUtils.toString(resposta.getEntity());
+
+        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
+        }
+
+        return mensagem_login;
     }
 }
