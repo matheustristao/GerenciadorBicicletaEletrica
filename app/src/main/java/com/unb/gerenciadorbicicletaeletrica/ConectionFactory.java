@@ -24,7 +24,9 @@ import java.util.ArrayList;
 public class ConectionFactory {
 
 
-    public boolean postHttp(String nome, String sobrenome, String email, String telefone, String senha){
+    private String mensagem;
+
+    public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
         try{
@@ -37,28 +39,14 @@ public class ConectionFactory {
             httpPost.setEntity(new UrlEncodedFormEntity(valores));
             final HttpResponse resposta = httpClient.execute(httpPost);
 
-            /*
-            runOnUiThread(new Runnable(){
-                public void run(){
-                    try {
-                        Toast.makeText(getBaseContext(), EntityUtils.toString(resposta.getEntity()), Toast.LENGTH_SHORT).show();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
-        catch(ClientProtocolException e){}
-        catch(IOException e){}
-        */
+            mensagem = EntityUtils.toString(resposta.getEntity());
+
 
         }
 
         catch(ClientProtocolException e){}
         catch(IOException e){}
 
-        return true;
+        return mensagem;
     }
 }
