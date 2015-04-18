@@ -7,17 +7,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
-
-import java.io.IOException;
-
 
 public class CadastroActivity extends Activity {
 
 
     ConectionFactory conectionFactory = new ConectionFactory();
     String recebimento_servidor;
+    private String SHAHash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +34,9 @@ public class CadastroActivity extends Activity {
 
                 if(senhaEt.getText().toString().equals(repeatsenhatEt.getText().toString())) {
 
+                    String hashSenha = Util.computeSHAHash(senhaEt.getText().toString());
 
-                    recebimento_servidor = conectionFactory.postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(), senhaEt.getText().toString());
+                    recebimento_servidor = conectionFactory.postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(), hashSenha);
 
 
                     runOnUiThread(new Runnable(){
@@ -51,7 +48,7 @@ public class CadastroActivity extends Activity {
                 else {
                     CadastroActivity.this.runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(CadastroActivity.this, "Senhas não batem. Digite novamente", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CadastroActivity.this, "Senhas não conferem. Digite novamente", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -60,6 +57,4 @@ public class CadastroActivity extends Activity {
         }.start();
 
     }
-
-
 }

@@ -32,7 +32,7 @@ public class ConectionFactory {
         numero_funcao = "1";
 
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
+        HttpPost httpPost = new HttpPost("http://192.168.0.103/xampp/server_bike_php/server.php");
         try{
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
             valores.add(new BasicNameValuePair("nome", nome));
@@ -62,7 +62,7 @@ public class ConectionFactory {
         numero_funcao = "2";
 
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://192.168.0.18/xampp/server_bike/server.php");
+        HttpPost httpPost = new HttpPost("http://192.168.0.103/xampp/server_bike_php/server.php");
         try {
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
 

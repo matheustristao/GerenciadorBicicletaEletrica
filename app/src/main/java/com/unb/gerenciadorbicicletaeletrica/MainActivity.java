@@ -14,7 +14,6 @@ public class MainActivity extends Activity {
 
     ConectionFactory conectionFactory = new ConectionFactory();
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +36,9 @@ public class MainActivity extends Activity {
                 EditText etemail = (EditText) findViewById(R.id.etEmail);
                 EditText etsenha = (EditText) findViewById(R.id.etSenha);
 
-                logado = conectionFactory.loginHttp(etemail.getText().toString(),etsenha.getText().toString());
+                final String hashSenha = Util.computeSHAHash(etsenha.getText().toString());
+
+                logado = conectionFactory.loginHttp(etemail.getText().toString(), hashSenha);
 
 
                 if (logado.equals("loguei")) {
@@ -47,7 +48,7 @@ public class MainActivity extends Activity {
                 else {
                     runOnUiThread(new Runnable(){
                         public void run(){
-                            Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos" , Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
                         }
                     });
 

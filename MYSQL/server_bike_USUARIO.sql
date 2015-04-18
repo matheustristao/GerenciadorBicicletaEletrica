@@ -30,7 +30,7 @@ CREATE TABLE `USUARIO` (
   `SOBRENOME` varchar(150) COLLATE utf8_bin NOT NULL,
   `TELEFONE` varchar(16) COLLATE utf8_bin NOT NULL,
   `EMAIL` varchar(150) COLLATE utf8_bin NOT NULL,
-  `SENHA` varchar(16) COLLATE utf8_bin NOT NULL,
+  `SENHA` varchar(40) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`ID_USUARIO`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
