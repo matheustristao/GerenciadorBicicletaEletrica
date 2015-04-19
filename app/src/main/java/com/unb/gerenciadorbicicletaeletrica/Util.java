@@ -29,8 +29,10 @@ public class Util {
     }
 
 
-    public static String computeSHAHash(String password)
+    public static String computeSHAHash(String email,String password)
     {
+        String info = new String("").concat(email).concat(password);
+
         MessageDigest mdSha1 = null;
         try
         {
@@ -39,7 +41,7 @@ public class Util {
             Log.e("myapp", "Error initializing SHA1 message digest");
         }
         try {
-            mdSha1.update(password.getBytes("ASCII"));
+            mdSha1.update(info.getBytes("ASCII"));
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

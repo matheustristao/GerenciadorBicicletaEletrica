@@ -29,14 +29,14 @@ public class MainActivity extends Activity {
         });
     }
 
-    public void logar(final View view){
+    public void logar(final View view) {
 
-        new Thread(){
-            public void run(){
+        new Thread() {
+            public void run() {
                 EditText etemail = (EditText) findViewById(R.id.etEmail);
                 EditText etsenha = (EditText) findViewById(R.id.etSenha);
 
-                final String hashSenha = Util.computeSHAHash(etsenha.getText().toString());
+                final String hashSenha = Util.computeSHAHash(etemail.getText().toString(),etsenha.getText().toString());
 
                 logado = conectionFactory.loginHttp(etemail.getText().toString(), hashSenha);
 
@@ -44,10 +44,9 @@ public class MainActivity extends Activity {
                 if (logado.equals("loguei")) {
                     Intent i = new Intent(view.getContext(), HomeActivity.class);
                     startActivity(i);
-                }
-                else {
-                    runOnUiThread(new Runnable(){
-                        public void run(){
+                } else {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
                             Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
                         }
                     });

@@ -27,12 +27,14 @@ public class ConectionFactory {
 
     private String numero_funcao;
 
+    private  final static String ENDERECO_SERVER = "http://192.168.56.101/server.php";
+
     public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
 
         numero_funcao = "1";
 
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://192.168.0.103/xampp/server_bike_php/server.php");
+        HttpPost httpPost = new HttpPost(ENDERECO_SERVER);
         try{
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
             valores.add(new BasicNameValuePair("nome", nome));
@@ -62,7 +64,7 @@ public class ConectionFactory {
         numero_funcao = "2";
 
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://192.168.0.103/xampp/server_bike_php/server.php");
+        HttpPost httpPost = new HttpPost(ENDERECO_SERVER);
         try {
             ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
 

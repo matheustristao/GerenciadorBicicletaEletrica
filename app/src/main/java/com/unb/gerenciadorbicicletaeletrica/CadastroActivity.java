@@ -34,7 +34,7 @@ public class CadastroActivity extends Activity {
 
                 if(senhaEt.getText().toString().equals(repeatsenhatEt.getText().toString())) {
 
-                    String hashSenha = Util.computeSHAHash(senhaEt.getText().toString());
+                    String hashSenha = Util.computeSHAHash(emailEt.getText().toString(),senhaEt.getText().toString());
 
                     recebimento_servidor = conectionFactory.postHttp(nomeEt.getText().toString(), sobrenomeEt.getText().toString(), emailEt.getText().toString(), telefoneEt.getText().toString(), hashSenha);
 
