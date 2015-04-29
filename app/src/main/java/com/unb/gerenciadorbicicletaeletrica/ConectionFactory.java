@@ -27,7 +27,9 @@ public class ConectionFactory {
 
     private String numero_funcao;
 
-    private  final static String ENDERECO_SERVER = "http://192.168.56.101/server.php";
+    private String mensagem_catraca;
+
+    private  final static String ENDERECO_SERVER = "http://192.168.1.90/server.php";
 
     public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
 
@@ -49,8 +51,6 @@ public class ConectionFactory {
             final HttpResponse resposta = httpClient.execute(httpPost);
 
             mensagem_cadastro = EntityUtils.toString(resposta.getEntity());
-
-
         }
 
         catch(ClientProtocolException e){}
@@ -84,5 +84,30 @@ public class ConectionFactory {
         }
 
         return mensagem_login;
+    }
+
+    public String postHttpCatraca(String senha,String estacao){
+
+        numero_funcao = "3";
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(ENDERECO_SERVER);
+        try{
+            ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
+            valores.add(new BasicNameValuePair("senha", senha));
+            valores.add(new BasicNameValuePair("estacao", estacao));
+
+            valores.add(new BasicNameValuePair("numerofuncao", numero_funcao));
+
+            httpPost.setEntity(new UrlEncodedFormEntity(valores));
+            final HttpResponse resposta = httpClient.execute(httpPost);
+
+            mensagem_catraca = EntityUtils.toString(resposta.getEntity());
+        }
+
+        catch(ClientProtocolException e){}
+        catch(IOException e){}
+
+        return mensagem_cadastro;
     }
 }
