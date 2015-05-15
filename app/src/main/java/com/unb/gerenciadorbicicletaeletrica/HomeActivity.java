@@ -2,11 +2,20 @@ package com.unb.gerenciadorbicicletaeletrica;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class HomeActivity extends ActionBarActivity {
+
+    ConectionFactory conectionFactory = new ConectionFactory();
+    String recebimento_servidor;
+    private String SHAHash;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,4 +45,26 @@ public class HomeActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public void enviarDadosEstacao(View view) {
+
+        new Thread() {
+            public void run() {
+                EditText estacaoEt = (EditText) findViewById(R.id.estacaoTextView);
+                final EditText senhaEt = (EditText) findViewById(R.id.senhaTextView);
+
+                final String hashSenha = Util.computeSHAHash(MainActivity.email_logado, senhaEt.getText().toString());
+
+                Log.e("email",MainActivity.email_logado);
+
+                recebimento_servidor = conectionFactory.postHttpCatraca(hashSenha, estacaoEt.getText().toString());
+
+                Log.e("email",recebimento_servidor);
+
+            }
+        }.start();
+    }
+
+
 }

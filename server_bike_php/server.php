@@ -1,6 +1,5 @@
 <?php
 
-
     $numero_funcao = $_POST['numerofuncao'];
     
 
@@ -17,6 +16,8 @@
         $telefone = $_POST['telefone'];
         $senha_usuario = $_POST['senha'];
 
+
+
         $userDao->saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario);
         break;
     case "2":
@@ -26,9 +27,10 @@
         $userDao->checkLogin($email, $senha_usuario);
         break;
     case "3":
+        $estacao = $_POST['estacao'];   
         $senha_usuario = $_POST['senha'];    
 
-        $usuario->liberar_catraca($senha_usuario);
+        $usuario->liberar_catraca($senha_usuario,$estacao);
         break;    
 }
 
@@ -185,31 +187,45 @@
 
     class Usuario
     {
-        public function liberar_catraca($senha){
 
-             $instanciaConection = self::instanciaConection();
+        static private $conection;
+
+        private static function instanciaConection() {
+
+        self::$conection = new ConectionFactory();
+
+        return self::$conection;
+    }
+
+        public function liberar_catraca($senha,$estacao){
+
+            $instanciaConection = self::instanciaConection();
 
             $userDao = new UsuarioDao();  
 
             if ($userDao->checkLoginHash($senha) == 1){
 
-                  if(self->checkVaga() == 1){
-                    
-                        $query = "insert into USUARIO_ESTACAO
+                $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';"; 
+  
+                $id_estacao = $instanciaConection->listData($query_busca);
+
+                  if(self::checkVaga() == 1){
+
+                        $query_insert = "insert into USUARIO_ESTACAO
                                 (USUARIO_ID_USUARIO,
                                  ESTACAO_ID_ESTACAO,
                                  HORA_INICIO,
                                  HORA_FIM,
                                  CARGA_RESTANTE)
-                            SELECT ID_USUARIO,
-                                    1,
+                            select ID_USUARIO,
+                                   1,
                                    SYSDATE(),
                                    NULL,
                                    NULL
-                            FROM   USUARIO 
-                            WHERE  SENHA LIKE '$senha';";
+                            from   USUARIO 
+                            where  USUARIO.SENHA like '$senha';";           
 
-                $instanciaConection->executaQuery($query);
+                $instanciaConection->executaQuery($query_insert);
 
                 echo "Vaga Liberada!";
                 
@@ -228,18 +244,18 @@
 
            $instanciaConection = self::instanciaConection();
 
-                $query = "select 1 from USUARIO_ESTACAO where HORA_FIM is null;";
+           // Se retornar 0 possui vaga
+            $query = "select * from USUARIO_ESTACAO where HORA_FIM is null;";
 
              $result = $instanciaConection->listData($query);
+         
+             $contagem = $result->num_rows; 
 
-             $contagem = $result->num_rows;        
-
-            if ($contagem > 0) {
-                // Nao possui vagas
-                return 0;
-            } else {
-                // possui vagas
+            if ($contagem == 0) {
                 return 1;
+            } else {
+                // Não possui vagas
+                return 0;
             }
 
         }

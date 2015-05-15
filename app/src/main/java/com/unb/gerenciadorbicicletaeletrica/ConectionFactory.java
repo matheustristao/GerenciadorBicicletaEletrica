@@ -29,7 +29,7 @@ public class ConectionFactory {
 
     private String mensagem_catraca;
 
-    private  final static String ENDERECO_SERVER = "http://192.168.1.90/server.php";
+    private  final static String ENDERECO_SERVER = "http://192.168.1.64/xampp/server_bike/server.php";
 
     public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
 
@@ -108,6 +108,6 @@ public class ConectionFactory {
         catch(ClientProtocolException e){}
         catch(IOException e){}
 
-        return mensagem_cadastro;
+        return mensagem_catraca;
     }
 }

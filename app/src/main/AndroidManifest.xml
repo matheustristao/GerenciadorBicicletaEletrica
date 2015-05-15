@@ -26,10 +26,6 @@
             android:name=".HomeActivity"
             android:label="@string/title_activity_home" >
         </activity>
-        <activity
-            android:name=".EstacaoActivity"
-            android:label="@string/title_activity_estacao" >
-        </activity>
     </application>
 
 </manifest>
