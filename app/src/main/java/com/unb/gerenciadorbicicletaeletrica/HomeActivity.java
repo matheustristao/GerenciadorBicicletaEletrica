@@ -47,7 +47,26 @@ public class HomeActivity extends ActionBarActivity {
     }
 
 
-    public void enviarDadosEstacao(View view) {
+    public void habilitarTrava(View view) {
+
+        new Thread() {
+            public void run() {
+                EditText estacaoEt = (EditText) findViewById(R.id.estacaoTextView);
+                final EditText senhaEt = (EditText) findViewById(R.id.senhaTextView);
+
+                final String hashSenha = Util.computeSHAHash(MainActivity.email_logado, senhaEt.getText().toString());
+
+                Log.e("email",hashSenha);
+
+                recebimento_servidor = conectionFactory.postHttpHabilitar(hashSenha, estacaoEt.getText().toString());
+
+                Log.e("email",recebimento_servidor);
+
+            }
+        }.start();
+    }
+
+    public void retirarBike(View view) {
 
         new Thread() {
             public void run() {
@@ -58,13 +77,12 @@ public class HomeActivity extends ActionBarActivity {
 
                 Log.e("email",MainActivity.email_logado);
 
-                recebimento_servidor = conectionFactory.postHttpCatraca(hashSenha, estacaoEt.getText().toString());
+                recebimento_servidor = conectionFactory.postHttpRetirar(hashSenha, estacaoEt.getText().toString());
 
                 Log.e("email",recebimento_servidor);
 
             }
         }.start();
     }
-
 
 }

@@ -21,13 +21,9 @@ import java.util.ArrayList;
 public class ConectionFactory {
 
 
-    private String mensagem_cadastro;
-
-    private String mensagem_login;
+    private String mensagem = "";
 
     private String numero_funcao;
-
-    private String mensagem_catraca;
 
     private  final static String ENDERECO_SERVER = "http://192.168.1.64/xampp/server_bike/server.php";
 
@@ -50,13 +46,13 @@ public class ConectionFactory {
             httpPost.setEntity(new UrlEncodedFormEntity(valores));
             final HttpResponse resposta = httpClient.execute(httpPost);
 
-            mensagem_cadastro = EntityUtils.toString(resposta.getEntity());
+            mensagem = EntityUtils.toString(resposta.getEntity());
         }
 
         catch(ClientProtocolException e){}
         catch(IOException e){}
 
-        return mensagem_cadastro;
+        return mensagem;
     }
 
     public String loginHttp(String email, String senha) {
@@ -77,16 +73,16 @@ public class ConectionFactory {
 
             final HttpResponse resposta = httpClient.execute(httpPost);
 
-            mensagem_login = EntityUtils.toString(resposta.getEntity());
+            mensagem = EntityUtils.toString(resposta.getEntity());
 
         } catch (ClientProtocolException e) {
         } catch (IOException e) {
         }
 
-        return mensagem_login;
+        return mensagem;
     }
 
-    public String postHttpCatraca(String senha,String estacao){
+    public String postHttpHabilitar(String senha,String estacao){
 
         numero_funcao = "3";
 
@@ -102,12 +98,39 @@ public class ConectionFactory {
             httpPost.setEntity(new UrlEncodedFormEntity(valores));
             final HttpResponse resposta = httpClient.execute(httpPost);
 
-            mensagem_catraca = EntityUtils.toString(resposta.getEntity());
+            mensagem = EntityUtils.toString(resposta.getEntity());
         }
 
         catch(ClientProtocolException e){}
         catch(IOException e){}
 
-        return mensagem_catraca;
+        return mensagem;
     }
+
+    public String postHttpRetirar(String senha,String estacao){
+
+        numero_funcao = "4";
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(ENDERECO_SERVER);
+        try{
+            ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
+            valores.add(new BasicNameValuePair("senha", senha));
+            valores.add(new BasicNameValuePair("estacao", estacao));
+
+            valores.add(new BasicNameValuePair("numerofuncao", numero_funcao));
+
+            httpPost.setEntity(new UrlEncodedFormEntity(valores));
+            final HttpResponse resposta = httpClient.execute(httpPost);
+
+            mensagem = EntityUtils.toString(resposta.getEntity());
+        }
+
+        catch(ClientProtocolException e){}
+        catch(IOException e){}
+
+        return mensagem;
+    }
+
+
 }

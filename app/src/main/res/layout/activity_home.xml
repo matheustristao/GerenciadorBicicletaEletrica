@@ -51,6 +51,13 @@
         android:id="@+id/buttonEscolha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LIBERAR TRAVA"
-        android:onClick="enviarDadosEstacao" />
+        android:text="HABILITAR TRAVA"
+        android:onClick="habilitarTrava" />
+
+    <Button
+        android:id="@+id/buttonEscolha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RETIRAR BIKE"
+        android:onClick="retirarBike" />
 </LinearLayout>

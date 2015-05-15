@@ -30,8 +30,14 @@
         $estacao = $_POST['estacao'];   
         $senha_usuario = $_POST['senha'];    
 
-        $usuario->liberar_catraca($senha_usuario,$estacao);
-        break;    
+        $usuario->habilitar_vaga($senha_usuario,$estacao);
+        break;  
+    case "4":
+        $estacao = $_POST['estacao'];   
+        $senha_usuario = $_POST['senha'];    
+
+        $usuario->retirar_bike($senha_usuario,$estacao);
+        break;        
 }
 
     //Classe responsável pela conexão com o banco
@@ -197,7 +203,8 @@
         return self::$conection;
     }
 
-        public function liberar_catraca($senha,$estacao){
+        public function habilitar_vaga($senha,$estacao){
+
 
             $instanciaConection = self::instanciaConection();
 
@@ -227,7 +234,7 @@
 
                 $instanciaConection->executaQuery($query_insert);
 
-                echo "Vaga Liberada!";
+                echo "Solicitação de acesso aprovada";
                 
                   }
                   else{
@@ -239,6 +246,42 @@
                 echo "Liberação não autorizada: Senha não reconhecida";
             }
         }
+
+        public function retirar_bike($senha,$estacao){
+
+            $instanciaConection = self::instanciaConection();
+
+            $userDao = new UsuarioDao();  
+
+            if ($userDao->checkLoginHash($senha) == 1){
+
+                $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';"; 
+  
+                $id_estacao = $instanciaConection->listData($query_busca);
+
+                  if(self::checkVaga() == 0){
+
+                        $query_insert = "update USUARIO_ESTACAO set 
+                                HORA_FIM = SYSDATE()
+                                where HORA_FIM is null
+                                and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";           
+
+                $instanciaConection->executaQuery($query_insert);
+
+                echo "Vaga liberada para novo uso, pode retirar a bike";
+                
+                  }
+                  else{
+                     echo "Nada a fazer";
+                  }
+            }
+
+            else{
+                echo "Liberação não autorizada: Senha não reconhecida";
+            }
+        }
+
+
 
         public static function checkVaga(){
 
