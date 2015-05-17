@@ -1,0 +1,51 @@
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tb_bottom"
+    android:layout_alignParentBottom="true"
+    android:layout_width="match_parent"
+    android:elevation="14dp"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@drawable/toolbar_rounded_corners"
+    android:minHeight="?attr/actionBarSize"
+    app:theme="@style/AppTheme">
+
+    <ImageView
+        android:id="@+id/empty1"
+        android:layout_width="24dp"
+        android:layout_height="48dp"
+        />
+
+    <ImageView
+        android:id="@+id/toolBtn_1"
+        android:src="@drawable/trava_56px"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        />
+
+    <ImageView
+        android:id="@+id/empty3"
+        android:layout_width="24dp"
+        android:layout_height="48dp"
+       />
+    <ImageView
+        android:id="@+id/toolBtn_2"
+        android:src="@drawable/bateria_56px"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        />
+
+    <ImageView
+        android:id="@+id/empty5"
+        android:layout_width="24dp"
+        android:layout_height="48dp"
+        />
+
+    <ImageView
+        android:id="@+id/toolBtn_3"
+        android:src="@drawable/mapa_56px"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        />
+
+
+    </android.support.v7.widget.Toolbar>
