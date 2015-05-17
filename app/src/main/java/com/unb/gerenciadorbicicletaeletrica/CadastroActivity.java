@@ -25,12 +25,12 @@ public class CadastroActivity extends Activity {
 
         new Thread(){
             public void run(){
-                EditText nomeEt = (EditText) findViewById(R.id.nome);
-                EditText sobrenomeEt = (EditText) findViewById(R.id.sobrenome);
-                EditText emailEt = (EditText) findViewById(R.id.email);
-                EditText telefoneEt = (EditText) findViewById(R.id.telefone);
-                EditText senhaEt = (EditText) findViewById(R.id.senha);
-                EditText repeatsenhatEt = (EditText) findViewById(R.id.repeat_senha);
+                EditText nomeEt = (EditText) findViewById(R.id.cadastro_nome);
+                EditText sobrenomeEt = (EditText) findViewById(R.id.cadastro_sobrenome);
+                EditText emailEt = (EditText) findViewById(R.id.cadastro_email);
+                EditText telefoneEt = (EditText) findViewById(R.id.cadastro_telefone);
+                EditText senhaEt = (EditText) findViewById(R.id.cadastro_senha);
+                EditText repeatsenhatEt = (EditText) findViewById(R.id.cadastro_repeat_senha);
 
                 if(senhaEt.getText().toString().equals(repeatsenhatEt.getText().toString())) {
 
