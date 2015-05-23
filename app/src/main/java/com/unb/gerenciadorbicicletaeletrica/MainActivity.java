@@ -11,6 +11,8 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
     private String logado;
+    public static String email_logado = "";
+
 
     ConectionFactory conectionFactory = new ConectionFactory();
 
@@ -36,10 +38,11 @@ public class MainActivity extends Activity {
                 EditText etemail = (EditText) findViewById(R.id.etEmail);
                 EditText etsenha = (EditText) findViewById(R.id.etSenha);
 
+                email_logado = etemail.getText().toString();
+
                 final String hashSenha = Util.computeSHAHash(etemail.getText().toString(),etsenha.getText().toString());
 
                 logado = conectionFactory.loginHttp(etemail.getText().toString(), hashSenha);
-
 
                 if (logado.equals("loguei")) {
                     Intent i = new Intent(view.getContext(), HomeActivity.class);

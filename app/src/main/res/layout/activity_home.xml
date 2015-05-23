@@ -17,10 +17,47 @@
         android:id="@+id/btMeusDados"
         android:layout_gravity="center_horizontal" />
 
-    <Button
+
+
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Liberar trava"
-        android:id="@+id/btLiberarTrava"
-        android:layout_gravity="center_horizontal" />
+        android:text="Confirme sua senha" />
+
+    <EditText
+        android:id="@+id/senhaTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="*SENHA" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Escolha a estação" />
+
+    <EditText
+        android:id="@+id/estacaoTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
+        android:hint="*ESTAÇÃO" />
+
+    <Button
+        android:id="@+id/buttonEscolha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HABILITAR TRAVA"
+        android:onClick="habilitarTrava" />
+
+    <Button
+        android:id="@+id/buttonEscolha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RETIRAR BIKE"
+        android:onClick="retirarBike" />
 </LinearLayout>
