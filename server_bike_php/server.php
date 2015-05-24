@@ -1,8 +1,9 @@
 <?php
 
-
-    $numero_funcao = $_POST['numerofuncao'];
-    
+	if (isset($_POST['numerofuncao'])) 
+	{
+		$numero_funcao = $_POST['numerofuncao'];
+    } else $numero_funcao = $_GET['numerofuncao'];
 
     //echo 'Numero funcao: ' .$numero_funcao. '  !!!';
 
@@ -24,6 +25,11 @@
 
         $userDao->checkLogin($email, $senha_usuario);
         break;
+	case "3":
+		$email = $_GET['email'];
+
+		$userDao->listUsuario($email);
+		break;
 }
 
     //Classe responsável pela conexão com o banco
@@ -106,7 +112,7 @@
         }
     }
 
-    public function listUsuario($nome,$sobrenome, $telefone, $email) {
+    public function listUsuario($email) {
 
         $instanciaConection = self::instanciaConection();
 
@@ -115,14 +121,17 @@
             P.SOBRENOME,
             P.EMAIL,
             P.TELEFONE 
-                from  usuario P
+                from  USUARIO P
                 where 
-                    P.NOME like '$nome'
-                    and
-                    P.SOBRENOME like '$sobrenome' 
+                    P.EMAIL like '$email'
                 ";
 
-        return $lista = $instanciaConection->listData($query);
+		$lista = $instanciaConection->listData($query);
+
+		$obj = $lista->fetch_object();
+		echo "{ 'Nome' : '".$obj->NOME."', 'Sobrenome' : '".$obj->SOBRENOME."', 'Email' : '".$obj->EMAIL."', 'Telefone' : '".$obj->TELEFONE."' } "  ;
+
+        return $obj;
     }
 
 
@@ -154,7 +163,4 @@
 
 
 }
-
-
-
 ?>

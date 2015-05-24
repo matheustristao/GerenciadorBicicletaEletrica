@@ -15,7 +15,8 @@
         android:stretchColumns="1,2,3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.36">
+        android:layout_weight="0.36"
+        android:id="@+id/activity_main">
 
 
     <TableRow
@@ -26,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:id="@+id/EmailTextView"
+                android:id="@+id/LabelEmailTextView"
                 android:layout_column="0" />
 
             <EditText

@@ -5,27 +5,34 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.TextView;
 
 
-public class HomeActivity extends ActionBarActivity {
-    ConectionFactory conectionFactory = new ConectionFactory();
-    private String email = "";
+public class DadosActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_dados);
 
         Intent intent = getIntent();
-        email = intent.getStringExtra("email");
+        Usuario usuario = (Usuario) intent.getSerializableExtra("Usuario");
+        TextView textNome = (TextView) findViewById(R.id.tvNome);
+        TextView textSobrenome = (TextView) findViewById(R.id.tvSobrenome);
+        TextView textEmail = (TextView) findViewById(R.id.tvEmail);
+        TextView textTelefone = (TextView) findViewById(R.id.tvTelefone);
+
+        textNome.setText(usuario.getNome());
+        textSobrenome.setText(usuario.getSobrenome());
+        textEmail.setText(usuario.getEmail());
+        textTelefone.setText(usuario.getTelefone());
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_dados, menu);
         return true;
     }
 
@@ -42,20 +49,5 @@ public class HomeActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void getDados(final View view) {
-
-        new Thread() {
-            public void run() {
-                final Usuario response = conectionFactory.getDadosUsuarioHttp(email);
-
-                Intent i = new Intent(view.getContext(), DadosActivity.class);
-                i.putExtra("Usuario", response);
-                startActivity(i);
-
-            }
-
-        }.start();
     }
 }
