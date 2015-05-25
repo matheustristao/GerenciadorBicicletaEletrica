@@ -2,6 +2,7 @@ package com.unb.gerenciadorbicicletaeletrica.componentesVisuais;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.EditText;
@@ -66,6 +67,7 @@ public class CadastroView  extends RelativeLayout{
         getTf_senha().setTextColor(Color.BLACK);
         getTf_senha().setLayoutParams(alinhamento);
         getTf_senha().setY(getTf_telefone().getY() + 90);
+        getTf_senha().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
 
 
         setTf_repeta_senha(new EditText(context));
@@ -74,6 +76,7 @@ public class CadastroView  extends RelativeLayout{
         getTf_repeta_senha().setTextColor(Color.BLACK);
         getTf_repeta_senha().setLayoutParams(alinhamento);
         getTf_repeta_senha().setY(getTf_senha().getY() + 90);
+        getTf_repeta_senha().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
 
         this.addView(getTf_nome());
         this.addView(getTf_sobre_nome());
