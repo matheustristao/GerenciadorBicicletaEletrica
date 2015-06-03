@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
 
         new Thread() {
             public void run() {
+
                 EditText etemail = (EditText) findViewById(R.id.etEmail);
                 EditText etsenha = (EditText) findViewById(R.id.etSenha);
 

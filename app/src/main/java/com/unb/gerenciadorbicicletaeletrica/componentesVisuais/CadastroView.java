@@ -63,20 +63,22 @@ public class CadastroView  extends RelativeLayout{
 
         setTf_senha(new EditText(context));
         getTf_senha().setHint("Senha");
+        getTf_senha().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         getTf_senha().setHintTextColor(Color.GRAY);
         getTf_senha().setTextColor(Color.BLACK);
         getTf_senha().setLayoutParams(alinhamento);
         getTf_senha().setY(getTf_telefone().getY() + 90);
-        getTf_senha().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+
 
 
         setTf_repeta_senha(new EditText(context));
         getTf_repeta_senha().setHint("Repita a senha");
+        getTf_repeta_senha().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         getTf_repeta_senha().setHintTextColor(Color.GRAY);
         getTf_repeta_senha().setTextColor(Color.BLACK);
         getTf_repeta_senha().setLayoutParams(alinhamento);
         getTf_repeta_senha().setY(getTf_senha().getY() + 90);
-        getTf_repeta_senha().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+
 
         this.addView(getTf_nome());
         this.addView(getTf_sobre_nome());

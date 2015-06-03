@@ -1,0 +1,13 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+    <com.unb.gerenciadorbicicletaeletrica.componentesVisuais.Tela_cadastro android:background="#ccc"
+        android:layout_width="match_parent" android:layout_height="match_parent" android:paddingLeft="20dp"
+        android:paddingBottom="40dp" app:exampleDimension="24sp" app:exampleColor="#33b5e5"
+        app:exampleString="Hello, tela_cadastro"
+        app:exampleDrawable="@android:drawable/ic_menu_add"
+        android:id="@+id/tela_cadastro"
+        />
+
+</FrameLayout>

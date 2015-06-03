@@ -26,7 +26,7 @@ public class ConectionFactory {
     private String numero_funcao;
 
     //private  final static String ENDERECO_SERVER = "http://192.168.1.64/xampp/server_bike/server.php";
-    private  final static String ENDERECO_SERVER = "http://192.168.1.17:8890/server.php";
+    private  final static String ENDERECO_SERVER = "http://192.168.25.1:8890/server.php";
 
     public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
 

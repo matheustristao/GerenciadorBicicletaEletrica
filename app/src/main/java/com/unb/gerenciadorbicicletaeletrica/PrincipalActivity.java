@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,6 +15,9 @@ import android.widget.RelativeLayout;
 
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.CadastroView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.LoginView;
+import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.Tela_cadastro;
+import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.TravaView;
+
 import  android.widget.RelativeLayout.LayoutParams;
 import  android.R.*;
 import android.widget.Toast;
@@ -31,6 +35,7 @@ public class PrincipalActivity  extends Activity
 
     private LoginView loginView;
     private CadastroView cadastroView;
+    private TravaView travaView;
 
     private RelativeLayout rlayout;
     private LayoutParams params;
@@ -43,7 +48,7 @@ public class PrincipalActivity  extends Activity
 
         Toast.makeText(this,"Loging solicita "+solicitaLogin(this),Toast.LENGTH_SHORT).show();
 
-        //configuraEventosToolbarBottom(this);
+        configuraEventosToolbarBottom(this);
 
     }
 
@@ -55,7 +60,8 @@ public class PrincipalActivity  extends Activity
         final int[] retorno = {0};
 
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
-        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,920);//Essa linha vai dar merda
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+
 
         loginView = new LoginView(context);
         loginView.setLayoutParams(params);
@@ -96,13 +102,14 @@ public class PrincipalActivity  extends Activity
         rlayout.addView(loginView);
 
 
+
         return retorno[0];
     }
 
     private void novoCadastro(final Context context)
     {
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
-        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,920);//Essa linha vai dar merda
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
         cadastroView = new CadastroView(context);
         cadastroView.setLayoutParams(params);
@@ -158,20 +165,39 @@ public class PrincipalActivity  extends Activity
         popViews();
         rlayout.addView(cadastroView);
     }
+    private void trava(final Context context)
+    {
+
+        rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+
+
+        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
+        travaView=new TravaView(context);
+        travaView.setLayoutParams(params);
+        travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context,"Trava clicada",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        popViews();
+        rlayout.addView(travaView);
+    }
     private void configuraEventosToolbarBottom( final Context context)
     {
         Toolbar mToolBarBottom=(Toolbar) findViewById(R.id.inc_tb_bottom);
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
-        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,920);//Essa linha vai dar merda
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
         //Botao Tranca
         mToolBarBottom.findViewById(R.id.toolBtn_1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-
-
-                popViews();
+              popViews();
+              trava(context);
 
             }
         });
@@ -181,7 +207,9 @@ public class PrincipalActivity  extends Activity
             @Override
             public void onClick(View view) {
 
+                popViews();
 
+               solicitaLogin(context);
 
             }
         });
@@ -197,6 +225,8 @@ public class PrincipalActivity  extends Activity
 
         });
     }
+
+
     private void popViews()
     {
         View v=null;
@@ -204,11 +234,23 @@ public class PrincipalActivity  extends Activity
         for (int i=0;i<total;i++)
         {
             v=rlayout.getChildAt(i);
-            if(v instanceof CadastroView || v instanceof LoginView)
+            if(v instanceof CadastroView || v instanceof LoginView || v instanceof TravaView )
                 rlayout.removeView(v);
         }
+
     }
 
+//Inner Class
 
+    private class CadastroAsync extends AsyncTask<String,Void,String>
+    {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+
+            return null;
+        }
+    }
 
 }
