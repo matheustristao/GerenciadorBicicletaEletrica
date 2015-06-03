@@ -7,10 +7,13 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,9 +26,12 @@ public class ConectionFactory {
 
     private String mensagem = "";
 
-    private String numero_funcao;
+    private String numero_funcao, numero_funcao_get;
 
-    private  final static String ENDERECO_SERVER = "http://192.168.1.64/xampp/server_bike/server.php";
+
+    private  final static String ENDERECO_SERVER = "http://192.168.0.104/xampp/server_bike_php/server.php";
+
+    private String _email;
 
     public String postHttp(String nome, String sobrenome, String email, String telefone, String senha){
 
@@ -58,6 +64,7 @@ public class ConectionFactory {
     public String loginHttp(String email, String senha) {
 
         numero_funcao = "2";
+        _email = email;
 
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(ENDERECO_SERVER);
@@ -107,6 +114,7 @@ public class ConectionFactory {
         return mensagem;
     }
 
+
     public String postHttpRetirar(String senha,String estacao){
 
         numero_funcao = "4";
@@ -132,5 +140,33 @@ public class ConectionFactory {
         return mensagem;
     }
 
+
+
+    public Usuario getDadosUsuarioHttp(String email) {
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(ENDERECO_SERVER + "?email=" + email + "&numerofuncao=5");
+        String serverString = "";
+
+        JSONObject json;
+        Usuario usuario = null;
+        try {
+            final HttpResponse response = httpClient.execute(httpGet);
+            serverString = EntityUtils.toString(response.getEntity());
+
+            json = new JSONObject(serverString);
+
+            usuario = new Usuario(json.getString("Nome"), json.getString("Sobrenome"), json.getString("Email"), json.getString("Telefone"));
+
+            return usuario;
+
+        } catch (ClientProtocolException e) {
+        } catch (IOException e) {
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return usuario;
+    }
 
 }
