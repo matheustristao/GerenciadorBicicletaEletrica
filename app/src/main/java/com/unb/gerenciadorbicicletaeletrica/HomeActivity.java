@@ -1,16 +1,22 @@
 package com.unb.gerenciadorbicicletaeletrica;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+<<<<<<< HEAD
 import android.widget.EditText;
 import android.widget.Toast;
+=======
+>>>>>>> visualizar_dados
 
 
 public class HomeActivity extends ActionBarActivity {
+    ConectionFactory conectionFactory = new ConectionFactory();
+    private String email = "";
 
     ConectionFactory conectionFactory = new ConectionFactory();
     String recebimento_servidor;
@@ -21,6 +27,9 @@ public class HomeActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        Intent intent = getIntent();
+        email = intent.getStringExtra("email");
     }
 
 
@@ -46,6 +55,7 @@ public class HomeActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+<<<<<<< HEAD
 
     public void habilitarTrava(View view) {
 
@@ -85,4 +95,20 @@ public class HomeActivity extends ActionBarActivity {
         }.start();
     }
 
+=======
+    public void getDados(final View view) {
+
+        new Thread() {
+            public void run() {
+                final Usuario response = conectionFactory.getDadosUsuarioHttp(email);
+
+                Intent i = new Intent(view.getContext(), DadosActivity.class);
+                i.putExtra("Usuario", response);
+                startActivity(i);
+
+            }
+
+        }.start();
+    }
+>>>>>>> visualizar_dados
 }

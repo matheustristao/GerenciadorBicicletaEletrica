@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.unb.gerenciadorbicicletaeletrica.DadosActivity"
+    android:id="@+id/activity_dados">
+
+    <TextView android:text="@string/label_nome" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/LabelNomeTextView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="@string/label_sobrenome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/LabelSobrenomeTextView"
+        android:layout_below="@+id/LabelNomeTextView"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="22dp" />
+
+    <TextView
+        android:text="@string/label_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/LabelEmailTextView"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/LabelSobrenomeTextView"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="@string/label_telefone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/LabelTelefoneTextView"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/LabelEmailTextView"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvNome"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:editable="false"
+        android:autoText="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvSobrenome"
+        android:layout_above="@+id/LabelEmailTextView"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvEmail"
+        android:layout_above="@+id/LabelTelefoneTextView"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvTelefone"
+        android:layout_alignBottom="@+id/LabelTelefoneTextView"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

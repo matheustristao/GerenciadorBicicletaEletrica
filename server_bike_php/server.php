@@ -1,7 +1,14 @@
 <?php
 
+<<<<<<< HEAD
     $numero_funcao = $_POST['numerofuncao'];
     
+=======
+	if (isset($_POST['numerofuncao'])) 
+	{
+		$numero_funcao = $_POST['numerofuncao'];
+    } else $numero_funcao = $_GET['numerofuncao'];
+>>>>>>> visualizar_dados
 
     //echo 'Numero funcao: ' .$numero_funcao. '  !!!';
 
@@ -26,6 +33,7 @@
 
         $userDao->checkLogin($email, $senha_usuario);
         break;
+<<<<<<< HEAD
     case "3":
         $estacao = $_POST['estacao'];   
         $senha_usuario = $_POST['senha'];    
@@ -38,6 +46,13 @@
 
         $usuario->retirar_bike($senha_usuario,$estacao);
         break;        
+=======
+	case "3":
+		$email = $_GET['email'];
+
+		$userDao->listUsuario($email);
+		break;
+>>>>>>> visualizar_dados
 }
 
     //Classe responsável pela conexão com o banco
@@ -120,6 +135,7 @@
         }
     }
 
+<<<<<<< HEAD
     public function checkLoginHash( $senha_usuario) {
 
         $instanciaConection = self::instanciaConection();
@@ -146,6 +162,9 @@
     }
 
     public function listUsuario($nome,$sobrenome, $telefone, $email) {
+=======
+    public function listUsuario($email) {
+>>>>>>> visualizar_dados
 
         $instanciaConection = self::instanciaConection();
 
@@ -154,14 +173,24 @@
             P.SOBRENOME,
             P.EMAIL,
             P.TELEFONE 
-                from  usuario P
+                from  USUARIO P
                 where 
+<<<<<<< HEAD
                     P.NOME like '$nome'
                     and
                     P.SOBRENOME like '$sobrenome' 
                 ;";
+=======
+                    P.EMAIL like '$email'
+                ";
+>>>>>>> visualizar_dados
 
-        return $lista = $instanciaConection->listData($query);
+		$lista = $instanciaConection->listData($query);
+
+		$obj = $lista->fetch_object();
+		echo "{ 'Nome' : '".$obj->NOME."', 'Sobrenome' : '".$obj->SOBRENOME."', 'Email' : '".$obj->EMAIL."', 'Telefone' : '".$obj->TELEFONE."' } "  ;
+
+        return $obj;
     }
 
     public function saveUsuario($nome, $sobrenome, $email, $telefone, $senha_usuario) {
@@ -191,6 +220,7 @@
 
     }
 
+<<<<<<< HEAD
     class Usuario
     {
 
@@ -305,4 +335,7 @@
 
     }
 
+=======
+}
+>>>>>>> visualizar_dados
 ?>
