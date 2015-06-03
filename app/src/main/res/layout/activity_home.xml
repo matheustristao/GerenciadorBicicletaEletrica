@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:text="Meus dados"
         android:id="@+id/btMeusDados"
+        android:onClick="getDados"
         android:layout_gravity="center_horizontal" />
 
 

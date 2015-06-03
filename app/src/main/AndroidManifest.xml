@@ -26,6 +26,14 @@
             android:name=".HomeActivity"
             android:label="@string/title_activity_home" >
         </activity>
+        <activity
+            android:name=".DadosActivity"
+            android:label="@string/title_activity_dados"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.unb.gerenciadorbicicletaeletrica.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
