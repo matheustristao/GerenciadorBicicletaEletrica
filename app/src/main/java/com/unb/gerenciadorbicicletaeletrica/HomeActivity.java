@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 
 public class HomeActivity extends ActionBarActivity {
-    ConectionFactory conectionFactory = new ConectionFactory();
+
     private String email = "";
 
     ConectionFactory conectionFactory = new ConectionFactory();
