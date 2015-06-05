@@ -37,6 +37,9 @@ public class PrincipalActivity  extends Activity
     private CadastroView cadastroView;
     private TravaView travaView;
 
+    public static String email_logado = "";
+    private String logado;
+
     private RelativeLayout rlayout;
     private LayoutParams params;
     @Override
@@ -48,7 +51,7 @@ public class PrincipalActivity  extends Activity
 
         Toast.makeText(this,"Loging solicita "+solicitaLogin(this),Toast.LENGTH_SHORT).show();
 
-        configuraEventosToolbarBottom(this);
+//        configuraEventosToolbarBottom(this);
 
     }
 
@@ -73,18 +76,48 @@ public class PrincipalActivity  extends Activity
         loginView.setBtn_enviar(btn_enviar);
         loginView.setBtn_cadastrar(btn_novoCadastro);
 
+
         btn_enviar.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
 
-                retorno[0] =loginView.logar();
-                Toast.makeText(context," Op 0 "+retorno[0],Toast.LENGTH_SHORT).show();
+//                retorno[0] =loginView.logar();
+//                Toast.makeText(context," Op 0 "+retorno[0],Toast.LENGTH_SHORT).show();
+//
+//                configuraEventosToolbarBottom(context);
 
-                configuraEventosToolbarBottom(context);
+                new Thread() {
+                    public void run() {
 
+                        EditText etemail = loginView.getTf_email();
+                        EditText etsenha = loginView.getTf_senha();
+
+                        email_logado = etemail.getText().toString();
+
+                        final String hashSenha = Util.computeSHAHash(etemail.getText().toString(),etsenha.getText().toString());
+
+                        logado = conectionFactory.loginHttp(etemail.getText().toString(), hashSenha);
+
+                        if (logado.equals("loguei")) {
+
+                             trava(context);
+                             configuraEventosToolbarBottom(context);
+
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        }
+                    }
+
+                }.start();
             }
         });
+
 
         btn_novoCadastro.setOnClickListener(new View.OnClickListener() {
 
@@ -165,6 +198,8 @@ public class PrincipalActivity  extends Activity
         popViews();
         rlayout.addView(cadastroView);
     }
+
+
     private void trava(final Context context)
     {
 
@@ -172,7 +207,7 @@ public class PrincipalActivity  extends Activity
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
 
-        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
         travaView=new TravaView(context);
         travaView.setLayoutParams(params);
         travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
@@ -183,10 +218,19 @@ public class PrincipalActivity  extends Activity
         });
 
         popViews();
-        rlayout.addView(travaView);
+
+        this.runOnUiThread(new Runnable() {
+
+            public void run()
+            {
+                rlayout.addView(travaView);
+            }
+        });
+
     }
     private void configuraEventosToolbarBottom( final Context context)
     {
+
         Toolbar mToolBarBottom=(Toolbar) findViewById(R.id.inc_tb_bottom);
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
@@ -207,10 +251,8 @@ public class PrincipalActivity  extends Activity
             @Override
             public void onClick(View view) {
 
-                popViews();
-
-               solicitaLogin(context);
-
+              popViews();
+         
             }
         });
 
@@ -229,14 +271,22 @@ public class PrincipalActivity  extends Activity
 
     private void popViews()
     {
-        View v=null;
-        int total=rlayout.getChildCount();
-        for (int i=0;i<total;i++)
-        {
-            v=rlayout.getChildAt(i);
-            if(v instanceof CadastroView || v instanceof LoginView || v instanceof TravaView )
-                rlayout.removeView(v);
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run()
+            {
+                View v=null;
+                int total=rlayout.getChildCount();
+                for (int i=0;i<total;i++)
+                {
+                    v=rlayout.getChildAt(i);
+                    if(v instanceof CadastroView || v instanceof LoginView || v instanceof TravaView )
+                        rlayout.removeView(v);
+                }
+            }
+        });
+
+
 
     }
 
