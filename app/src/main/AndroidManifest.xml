@@ -12,7 +12,11 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".CadastroActivity"
@@ -23,13 +27,12 @@
             android:label="@string/title_activity_home" >
         </activity>
         <activity
-            android:name=".PrincipalActivity"
-            android:label="BES" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
+            android:name=".DadosActivity"
+            android:label="@string/title_activity_dados"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.unb.gerenciadorbicicletaeletrica.MainActivity" />
         </activity>
     </application>
 

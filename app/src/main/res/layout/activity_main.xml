@@ -15,7 +15,8 @@
         android:stretchColumns="1,2,3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.36">
+        android:layout_weight="0.36"
+        android:id="@+id/activity_main">
 
 
     <TableRow
@@ -26,13 +27,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email"
-                android:id="@+id/EmailTextView"
+                android:id="@+id/LabelEmailTextView"
+                android:textColor="@color/black"
                 android:layout_column="0" />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="text"
+                android:textColorHint="@color/black"
                 android:layout_span="3"
                 android:ems="10"
                 android:id="@+id/etEmail"
@@ -49,6 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Senha"
+            android:textColor="@color/black"
             android:id="@+id/SenhaTextView"
             android:layout_column="0" />
 
@@ -76,6 +80,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Logar"
+                android:textColor="@color/black"
+                android:background="@android:color/darker_gray"
                 android:id="@+id/btLogin"
                 android:onClick="logar"
                 android:layout_column="2" />
@@ -109,6 +115,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Novo Usuário"
+                android:textColor="@color/black"
+                android:background="@android:color/darker_gray"
+                
                 android:id="@+id/btNovoUsuario"
                 android:layout_column="2"/>
         </TableRow>

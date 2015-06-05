@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
 
                 if (logado.equals("loguei")) {
                     Intent i = new Intent(view.getContext(), HomeActivity.class);
+                    i.putExtra("email", etemail.getText().toString());
                     startActivity(i);
                 } else {
                     runOnUiThread(new Runnable() {
