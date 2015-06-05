@@ -242,15 +242,19 @@ class Usuario
     
     public function habilitar_vaga($senha, $estacao)
     {
+        $instanciaConnection = self::instanciaConnection();
         
-        if ($userDao->checkLoginHash($senha) != 1) {
+        $userDao = new UsuarioDao();
+        
+
+
+        if ($userDao->checkLoginHash($senha) == 0) {
             echo "Liberação não autorizada: Senha não reconhecida";
             return -1;
         }
         
-        $instanciaConnection = self::instanciaConnection();
         
-        $userDao = new UsuarioDao();
+        
         
         
         //Checagem de solicitação aberta
