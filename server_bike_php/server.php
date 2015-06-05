@@ -9,8 +9,9 @@ if (isset($_POST['numerofuncao'])) {
 
 //echo 'Numero funcao: ' .$numero_funcao. '  !!!';
 
-$userDao = new UsuarioDao();
-$usuario = new Usuario();
+$userDao     = new UsuarioDao();
+$usuario     = new Usuario();
+$userArduino = new Arduino();
 
 switch ($numero_funcao) {
     case "1":
@@ -47,8 +48,16 @@ switch ($numero_funcao) {
         
         $userDao->listUsuario($email);
         break;
+    
     case "6":
-        $usuario->checkVaga();
+        $userArduino->checkSolicitacao();
+        break;
+    
+    case "7":
+        $tranca = $_POST['tranca'];
+        $flag   = $_POST['flag'];
+        
+        $userArduino->updateSolicitacao($tranca, $flag);
         break;
 }
 
@@ -270,7 +279,7 @@ class Usuario
         $instanciaConnection->executaQuery($solicitacao);
         
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(3);
+        sleep(10);
         
         
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
@@ -365,8 +374,9 @@ class Usuario
     
 }
 
-class Arduino {
-
+class Arduino
+{
+    
     static private $connection;
     
     private static function instanciaConnection()
@@ -376,9 +386,12 @@ class Arduino {
         
         return self::$connection;
     }
-
-    public function checkSolicitacao(){
-
+    
+    public function checkSolicitacao()
+    {
+        
+        $instanciaConnection = self::instanciaConnection();
+        
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null;";
         
         $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
@@ -387,43 +400,62 @@ class Arduino {
         
         //Solicitação não pode ser feita e sai da função
         if ($contagem == 0) {
+            echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
             return 0;
         }
-
-        return 1; 
+        echo "dbg: posso checar: contagem=" . $contagem;
+        return 1;
     }
-
-
-    public function updateSolicitacao($tranca, $flag){
-
+    
+    
+    public function updateSolicitacao($tranca, $flag)
+    {
+        
         //tranca = 1 liberou energia para a tranca
         //tranca = 0 cortou energia para a tranca
-
+        
         $id_tipo = 0;
-
-        if ($tranca == 1){
-            $id_tipo = 1 
+        
+        $instanciaConnection = self::instanciaConnection();
+        
+        if ($tranca == 1) {
+            $id_tipo = 1;
         }
-        if ($tranca == 2){
-            $id_tipo = 2 
+        if ($tranca == 2) {
+            $id_tipo = 2;
         }
-
-        if ($flag != NULL){
-
+        
+        if ($flag < 0) {
+            
             $query_insert = "update `server_bike`.`SOLICITACAO` 
                                     set DATA_FECHAMENTO = SYSDATE(),
-                                    FLAG_ERRO = $flag
+                                    FLAG_ERRO = $flag,
+                                    id_tipo = $id_tipo
                                     where DATA_FECHAMENTO is null;";
-
-
-
+            
+            
             $instanciaConnection->executaQuery($query_insert);
             
+            echo "dbg: caso com flag=" . $flag;
+            
+            return -1;
+            
         }
-
+        
+        
+        $query_insert = "update `server_bike`.`SOLICITACAO` 
+                                set DATA_FECHAMENTO = SYSDATE(),
+                                id_tipo = $id_tipo
+                                where DATA_FECHAMENTO is null;";
+        
+        
+        $instanciaConnection->executaQuery($query_insert);
+        echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
+        
+        return 0;
     }
-
-
+    
+    
 }
 
 
