@@ -1,6 +1,7 @@
 <?php
 
 
+
 if (isset($_POST['numerofuncao'])) {
     $numero_funcao = $_POST['numerofuncao'];
 } else
