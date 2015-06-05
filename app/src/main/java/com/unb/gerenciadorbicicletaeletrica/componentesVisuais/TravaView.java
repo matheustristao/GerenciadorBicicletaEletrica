@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+
+import com.unb.gerenciadorbicicletaeletrica.R;
 
 /**
  * Created by Ramon on 5/16/15.
@@ -12,7 +15,7 @@ import android.widget.RelativeLayout;
 public class TravaView  extends RelativeLayout {
 
 
-    private Button btn_trava;
+    private ImageButton btn_trava;
     private RelativeLayout.LayoutParams alinhamento;
 
     public TravaView(Context context) {
@@ -20,11 +23,11 @@ public class TravaView  extends RelativeLayout {
 
         alinhamento=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         alinhamento.addRule(ALIGN_END);
-        setBtn_trava(new Button(context));
+        setBtn_trava(new ImageButton(context));
         getBtn_trava().setY(300);
         getBtn_trava().setLayoutParams(alinhamento);
-        getBtn_trava().setTextColor(Color.BLACK);
-        getBtn_trava().setText("Botão");
+
+        ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
 
         this.addView(getBtn_trava());
     }
@@ -33,11 +36,11 @@ public class TravaView  extends RelativeLayout {
         super(context, attrs);
     }
 
-    public Button getBtn_trava() {
+    public ImageButton getBtn_trava() {
         return btn_trava;
     }
 
-    public void setBtn_trava(Button btn_trava) {
+    public void setBtn_trava(ImageButton btn_trava) {
         this.btn_trava = btn_trava;
     }
 

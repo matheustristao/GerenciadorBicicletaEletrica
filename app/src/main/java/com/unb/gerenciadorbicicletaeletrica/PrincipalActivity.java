@@ -252,7 +252,7 @@ public class PrincipalActivity  extends Activity
             public void onClick(View view) {
 
               popViews();
-         
+
             }
         });
 
