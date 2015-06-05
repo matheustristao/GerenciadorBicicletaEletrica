@@ -117,7 +117,7 @@
                 android:text="Novo Usuário"
                 android:textColor="@color/black"
                 android:background="@android:color/darker_gray"
-                
+
                 android:id="@+id/btNovoUsuario"
                 android:layout_column="2"/>
         </TableRow>
