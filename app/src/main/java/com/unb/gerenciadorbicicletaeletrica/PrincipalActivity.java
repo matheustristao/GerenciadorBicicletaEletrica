@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -42,12 +44,39 @@ public class PrincipalActivity  extends Activity
 
     private RelativeLayout rlayout;
     private LayoutParams params;
+    private Toolbar upperToolBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+        upperToolBar = (Toolbar) findViewById(R.id.tb_main);
+        upperToolBar.inflateMenu(R.menu.menu_main);
 
+        upperToolBar.setOnMenuItemClickListener(
+                new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+
+
+                        int id = item.getItemId();
+
+                        //noinspection SimplifiableIfStatement
+                        if (id == R.id.action_settings) {
+                            return true;
+                        }
+
+                        if (id == R.id.sair) {
+                            Toast.makeText(getBaseContext(),"Sair ",Toast.LENGTH_SHORT).show();
+                            popViews();
+                            solicitaLogin(getBaseContext());
+
+                        }
+                        return true;
+                    }
+                });
 
         Toast.makeText(this,"Loging solicita "+solicitaLogin(this),Toast.LENGTH_SHORT).show();
 
@@ -104,6 +133,7 @@ public class PrincipalActivity  extends Activity
                              trava(context);
                              configuraEventosToolbarBottom(context);
 
+
                         } else {
                             runOnUiThread(new Runnable() {
                                 public void run() {
@@ -130,10 +160,10 @@ public class PrincipalActivity  extends Activity
 
             }
         });
-
+        trava(context);//apagar essa linha
+        configuraEventosToolbarBottom(context);//Apagar essa linha
         popViews();
         rlayout.addView(loginView);
-
 
 
         return retorno[0];
@@ -214,6 +244,8 @@ public class PrincipalActivity  extends Activity
             @Override
             public void onClick(View view) {
                 Toast.makeText(context,"Trava clicada",Toast.LENGTH_SHORT).show();
+                travaView.changeLock();
+
             }
         });
 
@@ -234,6 +266,8 @@ public class PrincipalActivity  extends Activity
         Toolbar mToolBarBottom=(Toolbar) findViewById(R.id.inc_tb_bottom);
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+
+
 
         //Botao Tranca
         mToolBarBottom.findViewById(R.id.toolBtn_1).setOnClickListener(new View.OnClickListener() {
@@ -289,6 +323,13 @@ public class PrincipalActivity  extends Activity
 
 
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+//   
 
 //Inner Class
 

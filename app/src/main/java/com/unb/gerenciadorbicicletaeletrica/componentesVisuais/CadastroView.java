@@ -39,7 +39,6 @@ public class CadastroView  extends RelativeLayout{
         getTf_nome().setLayoutParams(alinhamento);
         getTf_nome().setY(100);
 
-
         setTf_sobre_nome(new EditText(context));
         getTf_sobre_nome().setHint("Sobrenome");
         getTf_sobre_nome().setHintTextColor(Color.GRAY);
@@ -53,6 +52,7 @@ public class CadastroView  extends RelativeLayout{
         getTf_email().setTextColor(Color.BLACK);
         getTf_email().setLayoutParams(alinhamento);
         getTf_email().setY(getTf_sobre_nome().getY() + 90);
+        getTf_email().setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS) ;
 
         setTf_telefone(new EditText(context));
         getTf_telefone().setHint("Telefone");
@@ -60,6 +60,7 @@ public class CadastroView  extends RelativeLayout{
         getTf_telefone().setTextColor(Color.BLACK);
         getTf_telefone().setLayoutParams(alinhamento);
         getTf_telefone().setY(getTf_email().getY() + 90);
+        getTf_telefone().setInputType(InputType.TYPE_CLASS_PHONE);
 
         setTf_senha(new EditText(context));
         getTf_senha().setHint("Senha");

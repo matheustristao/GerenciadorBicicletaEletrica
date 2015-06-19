@@ -17,6 +17,7 @@ public class TravaView  extends RelativeLayout {
 
     private ImageButton btn_trava;
     private RelativeLayout.LayoutParams alinhamento;
+    private boolean lock;
 
     public TravaView(Context context) {
         super(context);
@@ -28,7 +29,8 @@ public class TravaView  extends RelativeLayout {
         getBtn_trava().setLayoutParams(alinhamento);
 
         ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
-
+        btn_trava.setBackgroundColor(Color.TRANSPARENT);
+        this.lock=true;
         this.addView(getBtn_trava());
     }
 
@@ -51,5 +53,27 @@ public class TravaView  extends RelativeLayout {
     public void setAlinhamento(LayoutParams alinhamento) {
         this.alinhamento = alinhamento;
     }
-   
+
+    public boolean isLock() {
+        return lock;
+    }
+
+    public void setLock(boolean lock) {
+        this.lock = lock;
+
+    }
+    public void changeLock()
+    {
+        this.lock = lock;
+        if (lock)
+        {
+            ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_fechado);
+            btn_trava.setBackgroundColor(Color.TRANSPARENT);
+        }else
+        {
+            ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
+            btn_trava.setBackgroundColor(Color.TRANSPARENT);
+        }
+        this.lock = !lock;
+    }
 }
