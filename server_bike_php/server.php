@@ -406,10 +406,12 @@ class Arduino
         
         //Solicitação não pode ser feita e sai da função
         if ($contagem == 0) {
-            echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
+            // echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
+            echo "@0";
             return 0;
         }
-        echo "dbg: posso checar: contagem=n" . $contagem;
+        // echo "dbg: posso checar: contagem=n" . $contagem;
+        echo "@1";
         return 1;
     }
     
@@ -442,8 +444,9 @@ class Arduino
             
             $instanciaConnection->executaQuery($query_insert);
             
-            echo "dbg: caso com flag=" . $flag;
-            
+            // echo "dbg: caso com flag=" . $flag;
+            echo "@-";
+
             return -1;
             
         }
@@ -456,8 +459,9 @@ class Arduino
         
         
         $instanciaConnection->executaQuery($query_insert);
-        echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
+        // echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
         
+        echo "@1";
         return 0;
     }
     
