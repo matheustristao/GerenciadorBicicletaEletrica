@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.CadastroView;
+import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.DataView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.LoginView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.Tela_cadastro;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.TravaView;
@@ -38,6 +39,7 @@ public class PrincipalActivity  extends Activity
     private LoginView loginView;
     private CadastroView cadastroView;
     private TravaView travaView;
+    private DataView infoView;
 
     public static String email_logado = "";
     private String logado;
@@ -229,7 +231,23 @@ public class PrincipalActivity  extends Activity
         rlayout.addView(cadastroView);
     }
 
+    private void informacoes(final Context context)
+    {
+        rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
+
+//        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
+        infoView=new DataView(context);
+        infoView.setLayoutParams(params);
+
+        infoView.addInfo("Ramon","ramon@ramon","1234");
+
+        rlayout.addView(infoView);
+
+        Toast.makeText(context,"informacoes ",Toast.LENGTH_SHORT).show();
+
+    }
     private void trava(final Context context)
     {
 
@@ -267,8 +285,6 @@ public class PrincipalActivity  extends Activity
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
-
-
         //Botao Tranca
         mToolBarBottom.findViewById(R.id.toolBtn_1).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,6 +302,9 @@ public class PrincipalActivity  extends Activity
             public void onClick(View view) {
 
               popViews();
+              informacoes(context);
+
+
 
             }
         });
@@ -295,8 +314,7 @@ public class PrincipalActivity  extends Activity
             @Override
             public void onClick(View view) {
 
-                int total = rlayout.getChildCount();
-                Toast.makeText(context, "Total " + total, Toast.LENGTH_SHORT).show();
+
             }
 
         });
@@ -314,7 +332,7 @@ public class PrincipalActivity  extends Activity
                 for (int i=0;i<total;i++)
                 {
                     v=rlayout.getChildAt(i);
-                    if(v instanceof CadastroView || v instanceof LoginView || v instanceof TravaView )
+                    if(v instanceof CadastroView || v instanceof LoginView || v instanceof TravaView || v instanceof DataView )
                         rlayout.removeView(v);
                 }
             }
@@ -329,7 +347,7 @@ public class PrincipalActivity  extends Activity
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-//   
+//
 
 //Inner Class
 

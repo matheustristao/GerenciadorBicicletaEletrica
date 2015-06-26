@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.unb.gerenciadorbicicletaeletrica.R;
 
@@ -18,15 +20,25 @@ public class TravaView  extends RelativeLayout {
     private ImageButton btn_trava;
     private RelativeLayout.LayoutParams alinhamento;
     private boolean lock;
+    private TextView tv_email;
+    private TextView tv_nome;
+    private TextView tv_telefone;
 
-    public TravaView(Context context) {
+    public TravaView(Context context)
+    {
         super(context);
 
         alinhamento=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         alinhamento.addRule(ALIGN_END);
+
+
+
+
         setBtn_trava(new ImageButton(context));
         getBtn_trava().setY(300);
         getBtn_trava().setLayoutParams(alinhamento);
+
+
 
         ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
         btn_trava.setBackgroundColor(Color.TRANSPARENT);
