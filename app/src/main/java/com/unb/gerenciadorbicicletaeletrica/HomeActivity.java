@@ -66,6 +66,14 @@ public class HomeActivity extends ActionBarActivity {
 
                 recebimento_servidor = conectionFactory.postHttpHabilitar(hashSenha, estacaoEt.getText().toString());
 
+                runOnUiThread(new Runnable(){
+                    public void run(){
+                        Toast.makeText(getBaseContext(), recebimento_servidor , Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+
                 Log.e("email",recebimento_servidor);
 
             }
