@@ -432,7 +432,7 @@ class Arduino
         //Solicitação não pode ser feita e sai da função
         if ($contagem == 0) {
             //echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
-            echo "@0";
+            //echo "0";
             
 
             return 0;
@@ -440,6 +440,8 @@ class Arduino
         //echo "dbg: posso checar: contagem=n" . $contagem;
 
         while ($row = mysqli_fetch_array($idtipo)) {
+
+
 
         //echo "passei idtipo= " . $row['ID_TIPO'];
 

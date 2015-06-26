@@ -1,8 +1,8 @@
-/*
-   Web client sketch for IDE v1.0.1 and w5100/w5200
-   Uses POST method.
-   Posted November 2012 by SurferTim
-*/
+#define FUNC6_SOLICITACAO_LIBERAR  1
+#define FUNC6_SOLICITACAO_CORTAR  2
+#define FUNC6_SOLICITACAO_FALSE 0
+#define FALHA_FUNC7_LIBERAR -1
+#define FALHA_FUNC7_CORTAR -2
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -12,13 +12,13 @@ byte mac[] = {
 };
 
 //Change to your server domain
-char serverName[] = "192.168.0.10";
+char serverName[] = "192.168.1.2";
 
 // change to your server's port
 int serverPort = 80;
 
 // change to the page on that server
-char pageName[] = "/xampp/server_bike_php/server.php";
+char pageName[] = "/xampp/server_bike/server.php";
 
 EthernetClient client;
 int totalCount = 0;
@@ -62,18 +62,28 @@ void loop()
     sprintf(params, "numerofuncao=6");
     int flag = postPage(serverName, serverPort, pageName, params);
 
-    if (flag < 0)
-      Serial.print(F("Fail "));
-    else if (flag == 1)
-    {
-      sprintf(params, "numerofuncao=7&tranca=1&flag=0");
-      flag = postPage(serverName, serverPort, pageName, params);
+    if (flag == FUNC6_SOLICITACAO_FALSE) // nao roda funcao 7
+      Serial.println(F("Nao ha solicitacao "));
+    else {
+      if (flag == FUNC6_SOLICITACAO_LIBERAR) // Liberar energia
+        sprintf(params, "numerofuncao=7&tranca=1&flag=0");
 
-      if (!flag)
-        Serial.print(F("Fail numerofuncao=7 "));
-      else
-        Serial.print(F("OK numerofuncao=7 "));
+      if (flag == FUNC6_SOLICITACAO_CORTAR) // Fechar energia
+        sprintf(params, "numerofuncao=7&tranca=2&flag=0");
+
+      flag = postPage(serverName, serverPort, pageName, params); // POST no servidor
+
+      // tratando retorno
+      if (flag == FALHA_FUNC7_CORTAR)
+        sprintf(params, "Falha ao cortar %s", params);
+      else if (flag == FALHA_FUNC7_LIBERAR)
+        sprintf(params, "Falha ao liberar %s", params);
+
+      sprintf(params, "Finalizado funcao 7 %s", params);
     }
+
+    Serial.println(params);
+
     totalCount++;
     Serial.println();
     Serial.println(totalCount, DEC);
@@ -120,23 +130,31 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
 
     while (client.available())
     {
+
       inChar = client.read();
+      Serial.print(inChar);
       if (inChar == '@') // caracter do retorno echo php
       {
         startRead = true;
       }
       else if (startRead == true)
       {
-        Serial.write(inChar);
         client.stop();
         if (inChar == '1') {
           Serial.println("Retorno 1");
           Serial.println();
           return 1;
-        } else {
-          sprintf(thisData, "Retorno alternativo %c", inChar);
+        } else         if (inChar == '2') {
+          Serial.println("Retorno 2");
+          Serial.println();
+          return 2;
+        } else  if (inChar == '-') {
+          int retorno = inChar * (-1);
+          sprintf(thisData, "Retorno alternativo %d", retorno);
           Serial.println(thisData);
           Serial.println();
+          return retorno;
+        } if (inChar == '0') {
           return 0;
         }
       }
