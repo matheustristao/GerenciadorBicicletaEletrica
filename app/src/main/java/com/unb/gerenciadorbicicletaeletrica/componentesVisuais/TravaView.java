@@ -81,8 +81,8 @@ public class TravaView  extends RelativeLayout {
     }
     public void changeLock()
     {
-        this.lock = lock;
-        if (lock)
+        this.lock = !lock;
+        if (this.lock)
         {
             ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_fechado);
             btn_trava.setBackgroundColor(Color.TRANSPARENT);
@@ -91,7 +91,7 @@ public class TravaView  extends RelativeLayout {
             ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
             btn_trava.setBackgroundColor(Color.TRANSPARENT);
         }
-        this.lock = !lock;
+
     }
 
     public void habilitarTrava(final String email_logado, final String senha, final String estacao) {

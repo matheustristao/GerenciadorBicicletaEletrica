@@ -282,8 +282,6 @@ public class PrincipalActivity  extends Activity
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
-
-//        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
         travaView=new TravaView(context);
         travaView.setLayoutParams(params);
         travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
@@ -296,13 +294,12 @@ public class PrincipalActivity  extends Activity
 
                     travaView.retirarBike(usuario.getEmail(),"r","piloto");
                     Toast.makeText(context,"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-//                    travaView.changeLock();
+                    travaView.changeLock();
                 }else
                 {
                     travaView.habilitarTrava(usuario.getEmail(),"r","piloto");
-
                     Toast.makeText(context,"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-//                    travaView.changeLock();
+                    travaView.changeLock();
                 }
 
 
