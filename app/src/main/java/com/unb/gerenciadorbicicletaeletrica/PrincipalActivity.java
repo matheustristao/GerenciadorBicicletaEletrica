@@ -44,6 +44,7 @@ public class PrincipalActivity  extends Activity
 
     public static String email_logado = "";
     private String logado;
+    private Usuario usuario;
 
     private RelativeLayout rlayout;
     private LayoutParams params;
@@ -136,11 +137,13 @@ public class PrincipalActivity  extends Activity
 
                              trava(context);
                              configuraEventosToolbarBottom(context);
-
+                             usuario=conectionFactory.getDadosUsuarioHttp(email_logado);
 
                         } else {
                             runOnUiThread(new Runnable() {
                                 public void run() {
+                                    email_logado=null;
+                                    usuario=null;
                                     Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -248,8 +251,15 @@ public class PrincipalActivity  extends Activity
 //        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
         infoView=new DataView(context);
         infoView.setLayoutParams(params);
+        infoView.addInfo(usuario.getNome(),usuario.getEmail(),usuario.getTelefone());
 
-        infoView.addInfo("Ramon","ramon@ramon","1234");
+
+
+
+
+              //  infoView.addInfo(response.getNome(),response.getEmail(),response.getTelefone());
+
+
 
         rlayout.addView(infoView);
 
@@ -351,9 +361,20 @@ public class PrincipalActivity  extends Activity
         });
 
         //Botao bateria
+
         mToolBarBottom.findViewById(R.id.toolBtn_2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+//                new Thread(){
+//                        public void run()
+//                    {
+//                        final Usuario response = conectionFactory.getDadosUsuarioHttp(email_logado);
+//                        Toast.makeText(getBaseContext(),response.getNome(),Toast.LENGTH_SHORT);
+//                 }
+//                 }.start();
+
 
               popViews();
               informacoes(context);

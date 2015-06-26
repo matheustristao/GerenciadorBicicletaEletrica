@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
 
                 logado = conectionFactory.loginHttp(etemail.getText().toString(), hashSenha);
 
-                if (logado.equals("loguei")) {
+                if (logado.equals("loguei\n")) {
                     Intent i = new Intent(view.getContext(), HomeActivity.class);
                     i.putExtra("email", etemail.getText().toString());
                     startActivity(i);
