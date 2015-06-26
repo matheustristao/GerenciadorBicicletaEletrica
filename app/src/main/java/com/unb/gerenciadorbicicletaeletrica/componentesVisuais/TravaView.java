@@ -47,7 +47,7 @@ public class TravaView  extends RelativeLayout {
 
         ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
         btn_trava.setBackgroundColor(Color.TRANSPARENT);
-        this.lock=true;
+        this.lock=false;
         this.addView(getBtn_trava());
     }
 
@@ -107,6 +107,10 @@ public class TravaView  extends RelativeLayout {
                 Log.e("email", hashSenha);
                 recebimento_servidor = conectionFactory.postHttpHabilitar(hashSenha, estacao);
 
+//                if(!recebimento_servidor.equals("Solicitacao nao atendida pelo arduino"))
+//                {
+//                    travaView.changeLock();
+//                }
                 Log.e("email",recebimento_servidor);
             }
         }.start();
@@ -122,6 +126,11 @@ public class TravaView  extends RelativeLayout {
                 final String hashSenha = Util.computeSHAHash(email_logado, senha);
                 Log.e("email",MainActivity.email_logado);
                 recebimento_servidor = conectionFactory.postHttpRetirar(hashSenha, estacao);
+
+//                if(!recebimento_servidor.equals("Solicitacao nao atendida pelo arduino"))
+//                {
+//                   travaView.changeLock();
+//                }
                 Log.e("email",recebimento_servidor);
 
             }

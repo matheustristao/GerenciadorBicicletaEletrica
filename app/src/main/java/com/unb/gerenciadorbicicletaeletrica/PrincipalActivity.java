@@ -294,14 +294,15 @@ public class PrincipalActivity  extends Activity
                 if(travaView.isLock())
                 {
 
-                    travaView.habilitarTrava(usuario.getEmail(),"r","piloto");
+                    travaView.retirarBike(usuario.getEmail(),"r","piloto");
                     Toast.makeText(context,"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-                    travaView.changeLock();
+//                    travaView.changeLock();
                 }else
                 {
-                    travaView.retirarBike(usuario.getEmail(),"r","piloto");
+                    travaView.habilitarTrava(usuario.getEmail(),"r","piloto");
+
                     Toast.makeText(context,"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-                    travaView.changeLock();
+//                    travaView.changeLock();
                 }
 
 
