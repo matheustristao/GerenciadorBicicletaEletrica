@@ -54,9 +54,12 @@ switch ($numero_funcao) {
         break;
     
     case "7":
+        //$tranca = $_GET['tranca'];
+        //$flag   = $_GET['flag'];
+        
         $tranca = $_POST['tranca'];
         $flag   = $_POST['flag'];
-        
+
         $userArduino->updateSolicitacao($tranca, $flag);
         break;
 }
@@ -279,7 +282,7 @@ class Usuario
         $instanciaConnection->executaQuery($solicitacao);
         
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(60);
+        sleep(6);
         
         
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
@@ -345,12 +348,12 @@ class Usuario
                              VALUES
                              (SYSDATE(),
                               1,
-                              0)";
+                              2)";
         
         $instanciaConnection->executaQuery($solicitacao);
         
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(60);
+        sleep(6);
             
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
             
