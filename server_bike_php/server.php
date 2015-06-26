@@ -251,11 +251,7 @@ class Usuario
         if ($userDao->checkLoginHash($senha) == 0) {
             echo "Liberação não autorizada: Senha não reconhecida";
             return -1;
-        }
-        
-        
-        
-        
+        } 
         
         //Checagem de solicitação aberta
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null or FLAG_ERRO is not null;";
@@ -322,16 +318,47 @@ class Usuario
         $instanciaConnection = self::instanciaConnection();
         
         $userDao = new UsuarioDao();
+
+        if ($userDao->checkLoginHash($senha) == 0) {
+            echo "Liberação não autorizada: Senha não reconhecida";
+            return -1;
+        }
         
-        if ($userDao->checkLoginHash($senha) == 1) {
+         //Checagem de solicitação aberta
+        $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null or FLAG_ERRO is not null;";
+        
+        $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
+        
+        $contagem = $result_solicitacao->num_rows;
+        
+        
+        //Solicitação não pode ser feita e sai da função
+        if ($contagem != 0) {
+            echo "ERRO NO SERVIDOR, CONTATE ADMINISTADOR";
+            return -2;
+        }
+        
+        $solicitacao = "insert into SOLICITACAO 
+                            (DATA_ABERTURA, 
+                             ID_ARDUINO,
+                             ID_TIPO)
+                             VALUES
+                             (SYSDATE(),
+                              1,
+                              0)";
+        
+        $instanciaConnection->executaQuery($solicitacao);
+        
+        //Tempo para Arduiino verificar se ha liberacao    
+        sleep(60);
             
-            $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
+        $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
             
-            $id_estacao = $instanciaConnection->listData($query_busca);
+        $id_estacao = $instanciaConnection->listData($query_busca);
             
-            if (self::checkVaga() == 0) {
+        if (self::checkVaga() == 0) {
                 
-                $query_insert = "update USUARIO_ESTACAO set 
+            $query_insert = "update USUARIO_ESTACAO set 
                                 HORA_FIM = SYSDATE()
                                 where HORA_FIM is null
                                 and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
@@ -343,11 +370,6 @@ class Usuario
             } else {
                 echo "Nada a fazer";
             }
-        }
-        
-        else {
-            echo "Liberação não autorizada: Senha não reconhecida";
-        }
     }
     
     public static function checkVaga()
