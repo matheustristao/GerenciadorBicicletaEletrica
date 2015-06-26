@@ -283,7 +283,7 @@ class Usuario
         $instanciaConnection->executaQuery($solicitacao);
         
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(10);
+        sleep(60);
         
         
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
@@ -406,12 +406,12 @@ class Arduino
         
         //Solicitação não pode ser feita e sai da função
         if ($contagem == 0) {
-            // echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
-            echo "@0";
+            //echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
+            echo "0";
             return 0;
         }
-        // echo "dbg: posso checar: contagem=n" . $contagem;
-        echo "@1";
+        //echo "dbg: posso checar: contagem=n" . $contagem;
+        echo "1";
         return 1;
     }
     
@@ -444,9 +444,8 @@ class Arduino
             
             $instanciaConnection->executaQuery($query_insert);
             
-            // echo "dbg: caso com flag=" . $flag;
-            echo "@-";
-
+            echo "dbg: caso com flag=" . $flag;
+            
             return -1;
             
         }
@@ -459,9 +458,8 @@ class Arduino
         
         
         $instanciaConnection->executaQuery($query_insert);
-        // echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
+        echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
         
-        echo "@1";
         return 0;
     }
     
