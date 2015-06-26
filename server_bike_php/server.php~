@@ -394,8 +394,6 @@ class Arduino
     public function checkSolicitacao()
     {
         
-
-
         $instanciaConnection = self::instanciaConnection();
         
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null;";
@@ -406,12 +404,10 @@ class Arduino
         
         //Solicitação não pode ser feita e sai da função
         if ($contagem == 0) {
-            // echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
-            echo "@0";
+            echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
             return 0;
         }
-        // echo "dbg: posso checar: contagem=n" . $contagem;
-        echo "@1";
+        echo "dbg: posso checar: contagem=" . $contagem;
         return 1;
     }
     
@@ -420,7 +416,7 @@ class Arduino
     {
         
         //tranca = 1 liberou energia para a tranca
-        //tranca = 2 cortou energia para a tranca
+        //tranca = 0 cortou energia para a tranca
         
         $id_tipo = 0;
         
@@ -444,9 +440,8 @@ class Arduino
             
             $instanciaConnection->executaQuery($query_insert);
             
-            // echo "dbg: caso com flag=" . $flag;
-            echo "@-";
-
+            echo "dbg: caso com flag=" . $flag;
+            
             return -1;
             
         }
@@ -459,9 +454,8 @@ class Arduino
         
         
         $instanciaConnection->executaQuery($query_insert);
-        // echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
+        echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
         
-        echo "@1";
         return 0;
     }
     
@@ -470,4 +464,3 @@ class Arduino
 
 
 ?>
-
