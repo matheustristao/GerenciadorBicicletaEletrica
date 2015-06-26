@@ -290,7 +290,36 @@ class Usuario
         $id_estacao = $instanciaConnection->listData($query_busca);
         
         if (self::checkVaga() == 1) {
+
+            $query_id_max_solicitacao = "select max(idSOLICITACAO) as maxid from SOLICITACAO;";
+
+            $result_solicitacao = $instanciaConnection->listData($query_id_max_solicitacao);
+
+            while ($row = mysqli_fetch_array($result_solicitacao)) {
+                $max_id_solicitacao = $row['maxid'];
+            }
             
+            $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is not null and idSOLICITACAO = '$max_id_solicitacao';";
+        
+            $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
+            
+            $contagem = $result_solicitacao->num_rows;
+
+            if ($contagem == 0){
+
+             $query_insert = "update `server_bike`.`SOLICITACAO` 
+                                    set DATA_FECHAMENTO = SYSDATE(),
+                                    FLAG_ERRO = 3,
+                                    id_tipo = 1
+                                    where DATA_FECHAMENTO is null;";
+            
+            
+                $instanciaConnection->executaQuery($query_insert);
+
+                echo 'Solicitacao nao atendida pelo arduino';
+                return 0;
+            }
+
             $query_insert = "insert into USUARIO_ESTACAO
                                 (USUARIO_ID_USUARIO,
                                  ESTACAO_ID_ESTACAO,
@@ -307,7 +336,7 @@ class Usuario
             
             $instanciaConnection->executaQuery($query_insert);
             
-            echo "Solicitação de acesso aprovada";
+            echo "Solicitacao de acesso aprovada";
             
         } else {
             echo "Essa vaga está ocupada!";
