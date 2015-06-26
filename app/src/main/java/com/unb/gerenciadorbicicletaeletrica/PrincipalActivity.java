@@ -3,6 +3,7 @@ package com.unb.gerenciadorbicicletaeletrica;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ public class PrincipalActivity  extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         setContentView(R.layout.activity_principal);
         upperToolBar = (Toolbar) findViewById(R.id.tb_main);
         upperToolBar.inflateMenu(R.menu.menu_main);
@@ -71,8 +73,8 @@ public class PrincipalActivity  extends Activity
                         }
 
                         if (id == R.id.sair) {
-                            Toast.makeText(getBaseContext(),"Sair ",Toast.LENGTH_SHORT).show();
                             popViews();
+                            logado=null;
                             solicitaLogin(getBaseContext());
 
                         }
@@ -162,8 +164,8 @@ public class PrincipalActivity  extends Activity
 
             }
         });
-        trava(context);//apagar essa linha
-        configuraEventosToolbarBottom(context);//Apagar essa linha
+//        trava(context);//apagar essa linha
+//        configuraEventosToolbarBottom(context);//Apagar essa linha
         popViews();
         rlayout.addView(loginView);
 
@@ -233,6 +235,12 @@ public class PrincipalActivity  extends Activity
 
     private void informacoes(final Context context)
     {
+        if(logado==null)
+        {
+            bloqueiaEventosToolbarBottom(context);
+            return;
+        }
+
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
@@ -250,6 +258,11 @@ public class PrincipalActivity  extends Activity
     }
     private void trava(final Context context)
     {
+        if(logado==null)
+        {
+            bloqueiaEventosToolbarBottom(context);
+            return;
+        }
 
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
@@ -261,7 +274,7 @@ public class PrincipalActivity  extends Activity
         travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,"Trava clicada",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"STATUS LOGIN "+logado,Toast.LENGTH_SHORT).show();
                 travaView.changeLock();
 
             }
@@ -275,6 +288,47 @@ public class PrincipalActivity  extends Activity
             {
                 rlayout.addView(travaView);
             }
+        });
+
+    }
+    private void bloqueiaEventosToolbarBottom(final  Context context)
+    {
+        Toolbar mToolBarBottom=(Toolbar) findViewById(R.id.inc_tb_bottom);
+        rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+
+        //Botao Tranca
+        mToolBarBottom.findViewById(R.id.toolBtn_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                popViews();
+                solicitaLogin(context);
+
+            }
+        });
+
+        //Botao bateria
+        mToolBarBottom.findViewById(R.id.toolBtn_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                popViews();
+                solicitaLogin(context);
+
+
+
+            }
+        });
+
+        //Botao Mapa
+        mToolBarBottom.findViewById(R.id.toolBtn_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popViews();
+                solicitaLogin(context);
+            }
+
         });
 
     }

@@ -11,6 +11,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/colorMainBackground">
 
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_main"
         android:elevation="4dp"
