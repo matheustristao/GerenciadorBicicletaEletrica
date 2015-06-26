@@ -3,19 +3,27 @@ package com.unb.gerenciadorbicicletaeletrica.componentesVisuais;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.unb.gerenciadorbicicletaeletrica.ConectionFactory;
+import com.unb.gerenciadorbicicletaeletrica.MainActivity;
 import com.unb.gerenciadorbicicletaeletrica.R;
+import com.unb.gerenciadorbicicletaeletrica.Util;
 
 /**
  * Created by Ramon on 5/16/15.
  */
 public class TravaView  extends RelativeLayout {
 
+    ConectionFactory conectionFactory = new ConectionFactory();
+    String recebimento_servidor;
 
     private ImageButton btn_trava;
     private RelativeLayout.LayoutParams alinhamento;
@@ -30,9 +38,6 @@ public class TravaView  extends RelativeLayout {
 
         alinhamento=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         alinhamento.addRule(ALIGN_END);
-
-
-
 
         setBtn_trava(new ImageButton(context));
         getBtn_trava().setY(300);
@@ -87,5 +92,39 @@ public class TravaView  extends RelativeLayout {
             btn_trava.setBackgroundColor(Color.TRANSPARENT);
         }
         this.lock = !lock;
+    }
+
+    public void habilitarTrava(final String email_logado, final String senha, final String estacao) {
+
+        new Thread() {
+            public void run() {
+                EditText estacaoEt = (EditText) findViewById(R.id.estacaoTextView);
+                final EditText senhaEt = (EditText) findViewById(R.id.senhaTextView);
+
+                final String hashSenha;
+                hashSenha = Util.computeSHAHash(email_logado, senha);
+
+                Log.e("email", hashSenha);
+                recebimento_servidor = conectionFactory.postHttpHabilitar(hashSenha, estacao);
+
+                Log.e("email",recebimento_servidor);
+            }
+        }.start();
+    }
+
+    public void retirarBike(final String email_logado, final String senha, final String estacao) {
+
+        new Thread() {
+            public void run() {
+//                EditText estacaoEt = (EditText) findViewById(R.id.estacaoTextView);
+//                final EditText senhaEt = (EditText) findViewById(R.id.senhaTextView);
+
+                final String hashSenha = Util.computeSHAHash(email_logado, senha);
+                Log.e("email",MainActivity.email_logado);
+                recebimento_servidor = conectionFactory.postHttpRetirar(hashSenha, estacao);
+                Log.e("email",recebimento_servidor);
+
+            }
+        }.start();
     }
 }

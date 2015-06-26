@@ -21,10 +21,11 @@ import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.DataView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.LoginView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.Tela_cadastro;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.TravaView;
-
+import  android.text.*;
 import  android.widget.RelativeLayout.LayoutParams;
 import  android.R.*;
 import android.widget.Toast;
+import android.view.inputmethod.*;
 
 
 /**
@@ -50,11 +51,13 @@ public class PrincipalActivity  extends Activity
     private LayoutParams params;
     private Toolbar upperToolBar;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+
         setContentView(R.layout.activity_principal);
         upperToolBar = (Toolbar) findViewById(R.id.tb_main);
         upperToolBar.inflateMenu(R.menu.menu_main);
@@ -145,6 +148,8 @@ public class PrincipalActivity  extends Activity
                                     email_logado=null;
                                     usuario=null;
                                     Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
+
+                                    loginView.getTf_senha().setInputType(InputType.TYPE_NULL);//Tentativa de esconder o teclado
                                 }
                             });
 
@@ -284,8 +289,22 @@ public class PrincipalActivity  extends Activity
         travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,"STATUS LOGIN "+logado,Toast.LENGTH_SHORT).show();
-                travaView.changeLock();
+
+
+                if(travaView.isLock())
+                {
+
+                    travaView.habilitarTrava(usuario.getEmail(),"r","piloto");
+                    Toast.makeText(context,"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                    travaView.changeLock();
+                }else
+                {
+                    travaView.retirarBike(usuario.getEmail(),"r","piloto");
+                    Toast.makeText(context,"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                    travaView.changeLock();
+                }
+
+
 
             }
         });
