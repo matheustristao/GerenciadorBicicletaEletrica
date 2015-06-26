@@ -58,7 +58,7 @@ switch ($numero_funcao) {
         //$flag   = $_GET['flag'];
         
         $tranca = $_POST['tranca'];
-        $flag   = $_POST['flag'];
+        $flag  = $_POST['flag'];
 
         $userArduino->updateSolicitacao($tranca, $flag);
         break;
@@ -282,7 +282,7 @@ class Usuario
         $instanciaConnection->executaQuery($solicitacao);
         
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(6);
+        sleep(10);
         
         
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
@@ -382,7 +382,7 @@ class Usuario
         $instanciaConnection->executaQuery($solicitacao);
         
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(6);
+        sleep(10);
             
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
             
@@ -473,6 +473,7 @@ class Arduino
         //echo "passei idtipo= " . $row['ID_TIPO'];
 
         echo "@" . $row['ID_TIPO'];
+         // echo "@3";  
         return 1;
         }
     }
