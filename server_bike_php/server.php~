@@ -423,10 +423,10 @@ class Arduino
 
         $instanciaConnection = self::instanciaConnection();
         
-        $query_solicitacao = "select ID_TIPO from SOLICITACAO where DATA_FECHAMENTO is null;";
+        $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null;";
         
         $idtipo = $instanciaConnection->listData($query_solicitacao);
-        
+
         $contagem = $idtipo->num_rows;
         
         //Solicitação não pode ser feita e sai da função
@@ -439,10 +439,15 @@ class Arduino
         }
         //echo "dbg: posso checar: contagem=n" . $contagem;
 
-        echo "passei idtipo= " . $idtipo['ID_TIPO'];
+        while ($row = mysqli_fetch_array($idtipo)) {
 
-        echo "@" . $idtipo;
+
+
+        //echo "passei idtipo= " . $row['ID_TIPO'];
+
+        echo "@" . $row['ID_TIPO'];
         return 1;
+        }
     }
     
     
