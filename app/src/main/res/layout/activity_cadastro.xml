@@ -16,7 +16,7 @@
         android:text="Exemplo Conexão Web" />
 
     <EditText
-        android:id="@+id/nome"
+        android:id="@+id/cadastro_nome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -26,14 +26,14 @@
     </EditText>
 
     <EditText
-        android:id="@+id/sobrenome"
+        android:id="@+id/cadastro_sobrenome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="*Sobrenome" />
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/cadastro_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -41,7 +41,7 @@
         android:hint="*Email" />
 
     <EditText
-        android:id="@+id/telefone"
+        android:id="@+id/cadastro_telefone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -50,7 +50,7 @@
 
 
     <EditText
-        android:id="@+id/senha"
+        android:id="@+id/cadastro_senha"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -58,7 +58,7 @@
         android:hint="*SENHA" />
 
     <EditText
-        android:id="@+id/repeat_senha"
+        android:id="@+id/cadastro_repeat_senha"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -66,7 +66,7 @@
         android:hint="*CONFIRMAÇÃO DE SENHA" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/cadastro_btn_salvar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Enviar dados"
