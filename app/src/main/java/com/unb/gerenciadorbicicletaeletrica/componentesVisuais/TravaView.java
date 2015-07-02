@@ -31,11 +31,13 @@ public class TravaView  extends RelativeLayout {
     private TextView tv_email;
     private TextView tv_nome;
     private TextView tv_telefone;
+    private Context context;
+
 
     public TravaView(Context context)
     {
         super(context);
-
+        this.context=context;
         alinhamento=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         alinhamento.addRule(ALIGN_END);
 
@@ -81,6 +83,7 @@ public class TravaView  extends RelativeLayout {
     }
     public void changeLock()
     {
+
         this.lock = !lock;
         if (this.lock)
         {

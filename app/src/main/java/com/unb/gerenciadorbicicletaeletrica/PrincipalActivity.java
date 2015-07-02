@@ -126,10 +126,11 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                     }
                 });
 
-        Toast.makeText(this,"Loging solicita "+solicitaLogin(this),Toast.LENGTH_SHORT).show();
+        solicitaLogin(this);
 
-     configuraEventosToolbarBottom(this);
-        logado="ramon";
+
+//     configuraEventosToolbarBottom(this);
+//        logado="ramon";
 
 
 
@@ -191,15 +192,13 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
                                     YoYo.with(Techniques.Tada)
                                             .duration(700)
-                                            .playOn(etsenha);
-
-                                    etsenha.setText("Wrong password!");
-
+                                            .playOn(loginView);
                                     email_logado=null;
                                     usuario=null;
-                                    Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
+                                    loginView.setY(110);
+                                   Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
 
-                                    loginView.getTf_senha().setInputType(InputType.TYPE_NULL);//Tentativa de esconder o teclado
+
                                 }
                             });
 
@@ -308,13 +307,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         infoView.setLayoutParams(params);
         infoView.addInfo(usuario.getNome(),usuario.getEmail(),usuario.getTelefone());
 
-
-
-
-
               //  infoView.addInfo(response.getNome(),response.getEmail(),response.getTelefone());
-
-
 
         rlayout.addView(infoView);
 
@@ -332,17 +325,15 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
-        travaView=new TravaView(context);
+        if(travaView==null) travaView=new TravaView(context);
+
+  
         travaView.setLayoutParams(params);
         travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-
-
-
-                    Toast.makeText(context,"senha -> "+validarSenha(),Toast.LENGTH_SHORT).show();
-
+                validarSenha();
 
             }
         });
@@ -416,6 +407,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                 {
                     popViews();
                     trava(context);
+
                 }catch (Exception e)
                 {
 
@@ -587,26 +579,61 @@ private void removeMap()
 
                 try{
 
-                    if (senhaUsuario.equalsIgnoreCase("ramon"))
-                    {
-                        travaView.changeLock();
 
-                        if(travaView.isLock())
-                        {
-                            travaView.retirarBike(usuario.getEmail(),senhaUsuario,"piloto");
-                            Toast.makeText(getBaseContext(),"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-                            travaView.changeLock();
-                        }else
-                        {
-                            travaView.habilitarTrava(usuario.getEmail(),senhaUsuario,"piloto");
-                            Toast.makeText(getBaseContext(),"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-                            travaView.changeLock();
+                    new Thread() {
+                        public void run() {
+
+                            final String hashSenha = Util.computeSHAHash(email_logado,senhaUsuario);
+
+                            logado = conectionFactory.loginHttp(email_logado, hashSenha);
+
+                            if (logado.equals("loguei")) {
+
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+
+
+
+                                        if(travaView.isLock())
+                                        {
+                                            travaView.retirarBike(usuario.getEmail(),senhaUsuario,"piloto");
+//                                            Toast.makeText(getBaseContext(),"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                                            YoYo.with(Techniques.Pulse)
+                                                    .duration(800)
+                                                    .playOn(travaView);
+                                            travaView.changeLock();
+                                        }else
+                                        {
+                                            travaView.habilitarTrava(usuario.getEmail(),senhaUsuario,"piloto");
+//                                            Toast.makeText(getBaseContext(),"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                                            YoYo.with(Techniques.Pulse)
+                                                    .duration(800)
+                                                    .playOn(travaView);
+                                            travaView.changeLock();
+                                        }
+
+                                    }
+                                });
+
+
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+
+                                        Toast.makeText(getBaseContext(),"Senha incorreta",Toast.LENGTH_SHORT).show();
+                                        YoYo.with(Techniques.Tada)
+                                                .duration(700)
+                                                .playOn(travaView);
+
+                                    }
+                                });
+
+                            }
                         }
 
-                    }else
-                    {
-                        Toast.makeText(getBaseContext(),"Erro",Toast.LENGTH_SHORT).show();
-                    }
+                    }.start();
+
+
 
 
                 }catch (Exception e)
