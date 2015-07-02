@@ -7,7 +7,7 @@ if (isset($_POST['numerofuncao'])) {
 } else
     $numero_funcao = $_GET['numerofuncao'];
 
-//echo 'Numero funcao: ' .$numero_funcao. '  !!!';
+//echo 'Numero funcao: ' .$numero_funcao. ' s !!!';
 
 
 $userDao     = new UsuarioDao();
@@ -279,6 +279,8 @@ class Usuario
         
         if (self::checkVaga($senha) == 1) {
 
+            acionaArduino($estacao);
+
 
             $query_insert = "insert into USUARIO_ESTACAO
                                 (USUARIO_ID_USUARIO,
@@ -318,7 +320,7 @@ class Usuario
                              VALUES
                              (SYSDATE(),
                               1,
-                              $tipo_solicitacao)";
+                              '$tipo_solicitacao')";
         
         $instanciaConnection->executaQuery($solicitacao);
     }
@@ -365,23 +367,23 @@ class Usuario
 
     public function acionaArduino($estacao)
     {
-        criarSolicitacao(SLND_ON);
+        criarSolicitacao($SLND_ON);
 
         //Tempo para Arduiino verificar se ha liberacao    
-        // sleep(10);
+         sleep(10);
         
         
         if (checkSolicitacao($estacao) == 0){
-                insereFlag(ERR_SLND_ON);
+                insereFlag($ERR_SLND_ON);
                 return 0;
             }
 
-        // sleep(10);
+         sleep(10);
 
-        criarSolicitacao(SLND_OFF);
+        criarSolicitacao($SLND_OFF);
 
         if (checkSolicitacao($estacao) == 0){
-                insereFlag(ERR_SLND_OFF);
+                insereFlag($ERR_SLND_OFF);
                 return 0;
             }
     }
