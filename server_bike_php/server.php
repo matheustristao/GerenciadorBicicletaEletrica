@@ -270,6 +270,10 @@ class Usuario
             return -2;
         }
         
+        if (self::checkVaga($senha) == 1) {
+
+        //Solicitacao do tipo 1
+
         $solicitacao = "insert into SOLICITACAO 
                             (DATA_ABERTURA, 
                              ID_ARDUINO,
@@ -289,7 +293,7 @@ class Usuario
         
         $id_estacao = $instanciaConnection->listData($query_busca);
         
-        if (self::checkVaga() == 1) {
+        
 
             $query_id_max_solicitacao = "select max(idSOLICITACAO) as maxid from SOLICITACAO;";
 
@@ -338,7 +342,8 @@ class Usuario
             
             echo "Solicitacao de acesso aprovada";
             
-        } else {
+        } 
+        else {
             echo "Essa vaga está ocupada!";
         }
         
@@ -388,7 +393,7 @@ class Usuario
             
         $id_estacao = $instanciaConnection->listData($query_busca);
             
-        if (self::checkVaga() == 0) {
+        if (self::checkVaga($senha) == 2) {
                 
             $query_insert = "update USUARIO_ESTACAO set 
                                 HORA_FIM = SYSDATE()
@@ -404,11 +409,10 @@ class Usuario
             }
     }
     
-    public static function checkVaga()
+    public static function checkVaga($senha)
     {
         
         $instanciaConnection = self::instanciaConnection();
-        
         
         
         // Se retornar 0 possui vaga
@@ -420,14 +424,27 @@ class Usuario
         
         if ($contagem == 0) {
             //Vaga pode ser utilizada de acordo com o BANCO na tabela USUAARIO_ESTACAO
-            
             return 1;
         } else {
-            // Não possui vagas
-            return 0;
+
+        // TEM VAGA OCUPADA POR MIM?
+        $query_consulta_usuario_estacao = "select * from USUARIO_ESTACAO 
+                                            where HORA_FIM is NULL 
+                                            and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
+
+        $se_ocupado = $instanciaConnection->listData($query_consulta_usuario_estacao);
+
+        $contagem = $se_ocupado->num_rows;
+        
+        //Há HORA_FIM null, estação ocupada
+        if ($contagem != 0) {
+            echo "vaga usada por voce";
+            return 2;
         }
-        
-        
+
+            return 0;
+        } 
+
     }
     
 }
@@ -482,8 +499,8 @@ class Arduino
     public function updateSolicitacao($tranca, $flag)
     {
         
-        //tranca = 1 liberou energia para a tranca
-        //tranca = 2 cortou energia para a tranca
+        //tranca = 1 abaixou solenoide
+        //tranca = 2 levantou solenoide
         
         $id_tipo = 0;
         
