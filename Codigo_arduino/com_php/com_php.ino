@@ -1,3 +1,6 @@
+#define sol 3 //Define Lamp como 7
+
+
 #define FUNC6_SOLICITACAO_LIBERAR  1
 #define FUNC6_SOLICITACAO_CORTAR  2
 #define FUNC6_SOLICITACAO_FALSE 0
@@ -10,9 +13,12 @@
 byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
+// var Solenoide
+int sensor = 3;
+int leitura = 0;
 
 //Change to your server domain
-char serverName[] = "192.168.1.2";
+char serverName[] = "192.168.1.3";
 
 // change to your server's port
 int serverPort = 80;
@@ -27,7 +33,7 @@ char params[32];
 
 // set this to the number of milliseconds delay
 // this is 30 seconds
-#define delayMillis 5000UL
+#define delayMillis 3000UL
 
 unsigned long thisMillis = 0;
 unsigned long lastMillis = 0;
@@ -45,15 +51,19 @@ void setup() {
 
   delay(2000);
   Serial.println(F("Ready"));
+
+  setupSolenoide();
 }
+
 
 void loop()
 {
+  char * out_msg;
   // If using a static IP, comment out the next line
   Ethernet.maintain();
 
   thisMillis = millis();
-
+  
   if (thisMillis - lastMillis > delayMillis)
   {
     lastMillis = thisMillis;
@@ -65,24 +75,29 @@ void loop()
     if (flag == FUNC6_SOLICITACAO_FALSE) // nao roda funcao 7
       Serial.println(F("Nao ha solicitacao "));
     else {
-      if (flag == FUNC6_SOLICITACAO_LIBERAR) // Liberar energia
+      if (flag == FUNC6_SOLICITACAO_LIBERAR) {// Liberar energia
         sprintf(params, "numerofuncao=7&tranca=1&flag=0");
+       acionamentosLOW();
+      }
 
-      if (flag == FUNC6_SOLICITACAO_CORTAR) // Fechar energia
-        sprintf(params, "numerofuncao=7&tranca=2&flag=0");
-
+      if (flag == FUNC6_SOLICITACAO_CORTAR) { // Fechar energia
+        sprintf(params, "numerofuncao=7&tranca=2&flag=0");        
+         acionamentosHIGH();
+        
+      }
       flag = postPage(serverName, serverPort, pageName, params); // POST no servidor
 
       // tratando retorno
       if (flag == FALHA_FUNC7_CORTAR)
-        sprintf(params, "Falha ao cortar %s", params);
+        sprintf(out_msg, "Falha ao cortar %s", params);
       else if (flag == FALHA_FUNC7_LIBERAR)
-        sprintf(params, "Falha ao liberar %s", params);
+        sprintf(out_msg, "Falha ao liberar %s", params);
 
-      sprintf(params, "Finalizado funcao 7 %s", params);
+      sprintf(out_msg, "Finalizado funcao 7 %s", params);
+          
     }
 
-    Serial.println(params);
+    Serial.println(out_msg);
 
     totalCount++;
     Serial.println();
@@ -141,18 +156,11 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
       {
         client.stop();
         if (inChar == '1') {
-          Serial.println("Retorno 1");
-          Serial.println();
           return 1;
         } else         if (inChar == '2') {
-          Serial.println("Retorno 2");
-          Serial.println();
           return 2;
         } else  if (inChar == '-') {
           int retorno = inChar * (-1);
-          sprintf(thisData, "Retorno alternativo %d", retorno);
-          Serial.println(thisData);
-          Serial.println();
           return retorno;
         } if (inChar == '0') {
           return 0;
@@ -170,4 +178,24 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
     }
   }
   return -1;
+}
+
+void acionamentosLOW() {
+
+  digitalWrite(sol, LOW);
+
+}
+
+
+void acionamentosHIGH() {
+
+  digitalWrite(sol, HIGH);
+}
+
+void setupSolenoide() {
+
+  pinMode(sol, OUTPUT); //Define o pino 7 como saída
+  // pinMode(sensor, INPUT);
+  // digitalWrite(sensor, HIGH);
+  Serial.println("rodei setup");
 }
