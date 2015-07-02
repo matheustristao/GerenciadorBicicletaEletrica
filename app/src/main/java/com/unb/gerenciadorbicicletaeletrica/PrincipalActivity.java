@@ -1,5 +1,6 @@
 package com.unb.gerenciadorbicicletaeletrica;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +8,9 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.maps.model.Marker;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.CadastroView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.DataView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.LoginView;
@@ -26,12 +30,26 @@ import  android.widget.RelativeLayout.LayoutParams;
 import  android.R.*;
 import android.widget.Toast;
 import android.view.inputmethod.*;
+import android.app.AlertDialog;
+import  android.content.*;
 
+//MAPA
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import android.os.Bundle;
+import android.support.v7.app.*;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 /**
  * Created by Ramon on 5/16/15.
  */
-public class PrincipalActivity  extends Activity
+public class PrincipalActivity  extends FragmentActivity implements GoogleMap.OnMarkerClickListener
 {
     private String sessaoFake=null;
     private ConectionFactory conectionFactory = new ConectionFactory();
@@ -46,11 +64,20 @@ public class PrincipalActivity  extends Activity
     public static String email_logado = "";
     private String logado;
     private Usuario usuario;
+    private String senhaUsuario;
 
     private RelativeLayout rlayout;
     private LayoutParams params;
     private Toolbar upperToolBar;
 
+    private AlertDialog alert;
+
+    //MAPa
+    private LatLng location = new LatLng(-15.988267,  -48.044216);
+
+    private GoogleMap map;
+    private SupportMapFragment mMapFragment;
+    private Marker markerMaps;//Marcador no mapa
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,9 +99,6 @@ public class PrincipalActivity  extends Activity
                         int id = item.getItemId();
 
                         //noinspection SimplifiableIfStatement
-                        if (id == R.id.action_settings) {
-                            return true;
-                        }
 
                         if (id == R.id.sair) {
                             popViews();
@@ -82,13 +106,29 @@ public class PrincipalActivity  extends Activity
                             solicitaLogin(getBaseContext());
 
                         }
+                        if(id==R.id.satelite)
+                        {
+                            map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                        }
+                        if(id==R.id.mapa)
+                        {
+                            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        }
+                        if(id==R.id.hibrido)
+                        {
+                            map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        }
+
                         return true;
                     }
                 });
 
         Toast.makeText(this,"Loging solicita "+solicitaLogin(this),Toast.LENGTH_SHORT).show();
 
-//        configuraEventosToolbarBottom(this);
+     configuraEventosToolbarBottom(this);
+        logado="ramon";
+
+
 
     }
 
@@ -172,8 +212,8 @@ public class PrincipalActivity  extends Activity
 
             }
         });
-//        trava(context);//apagar essa linha
-//        configuraEventosToolbarBottom(context);//Apagar essa linha
+        trava(context);//apagar essa linha
+        configuraEventosToolbarBottom(context);//Apagar essa linha
         popViews();
         rlayout.addView(loginView);
 
@@ -289,23 +329,14 @@ public class PrincipalActivity  extends Activity
             public void onClick(View view) {
 
 
-                if(travaView.isLock())
-                {
 
-                    travaView.retirarBike(usuario.getEmail(),"r","piloto");
-                    Toast.makeText(context,"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-                    travaView.changeLock();
-                }else
-                {
-                    travaView.habilitarTrava(usuario.getEmail(),"r","piloto");
-                    Toast.makeText(context,"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
-                    travaView.changeLock();
-                }
 
+                    Toast.makeText(context,"senha -> "+validarSenha(),Toast.LENGTH_SHORT).show();
 
 
             }
         });
+
 
         popViews();
 
@@ -371,8 +402,15 @@ public class PrincipalActivity  extends Activity
             @Override
             public void onClick(View view) {
 
-              popViews();
-              trava(context);
+                try
+                {
+                    popViews();
+                    trava(context);
+                }catch (Exception e)
+                {
+
+                }
+
 
             }
         });
@@ -393,8 +431,16 @@ public class PrincipalActivity  extends Activity
 //                 }.start();
 
 
-              popViews();
-              informacoes(context);
+                try
+                {
+                    popViews();
+                    informacoes(context);
+
+                }catch (Exception e)
+                {
+
+                }
+
 
 
 
@@ -405,6 +451,17 @@ public class PrincipalActivity  extends Activity
         mToolBarBottom.findViewById(R.id.toolBtn_3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                try
+                {
+                    popViews();
+                   addMap();
+
+                }catch (Exception e)
+                {
+
+                }
 
 
             }
@@ -427,6 +484,8 @@ public class PrincipalActivity  extends Activity
                     if(v instanceof CadastroView || v instanceof LoginView || v instanceof TravaView || v instanceof DataView )
                         rlayout.removeView(v);
                 }
+
+                removeMap();
             }
         });
 
@@ -440,7 +499,44 @@ public class PrincipalActivity  extends Activity
         return true;
     }
 //
+private void addMap()
+{
+    FragmentManager fm = getFragmentManager();
+   // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+    mMapFragment = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map));
+    map = mMapFragment.getMap();
 
+   // map.addMarker(new MarkerOptions().position(location).title("Posto de recarga Piloto"));
+
+    markerMaps = map.addMarker(new MarkerOptions()
+            .position(location)
+            .title("Posto de recarga Piloto")
+            .snippet("1 Vaga dispoível")
+           );
+
+    map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 20));
+    map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+    mMapFragment.getView().setVisibility(View.VISIBLE);
+
+    map.setOnMarkerClickListener(this);
+
+//Mostra opcoes de mapa no menu
+    upperToolBar.getMenu().findItem(R.id.mapa).setVisible(true);
+    upperToolBar.getMenu().findItem(R.id.satelite).setVisible(true);
+    upperToolBar.getMenu().findItem(R.id.hibrido).setVisible(true);
+
+   // MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.iconMarker));
+}
+
+private void removeMap()
+{
+    mMapFragment = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map));
+    map = mMapFragment.getMap();
+    mMapFragment.getView().setVisibility(View.INVISIBLE);
+    upperToolBar.getMenu().findItem(R.id.mapa).setVisible(false);
+    upperToolBar.getMenu().findItem(R.id.satelite).setVisible(false);
+    upperToolBar.getMenu().findItem(R.id.hibrido).setVisible(false);
+}
 //Inner Class
 
     private class CadastroAsync extends AsyncTask<String,Void,String>
@@ -453,5 +549,104 @@ public class PrincipalActivity  extends Activity
             return null;
         }
     }
+
+
+    private String validarSenha() {
+
+
+        final EditText[] edit = {null};
+        //Cria o gerador do AlertDialog
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //define o titulo
+        builder.setTitle("Senha");
+        //define a mensagem
+        builder.setMessage("Informe a sua senha");
+
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_signin, null);
+
+        AlertDialog.Builder builder1 = builder;
+        builder1.setView(dialogView);
+        builder1.setPositiveButton("Confirma", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+
+               edit[0] = (EditText) dialogView.findViewById(R.id.password);
+               senhaUsuario= edit[0].getText().toString();
+
+                try{
+
+                    if (senhaUsuario.equalsIgnoreCase("ramon"))
+                    {
+                        travaView.changeLock();
+
+                        if(travaView.isLock())
+                        {
+                            travaView.retirarBike(usuario.getEmail(),senhaUsuario,"piloto");
+                            Toast.makeText(getBaseContext(),"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                            travaView.changeLock();
+                        }else
+                        {
+                            travaView.habilitarTrava(usuario.getEmail(),senhaUsuario,"piloto");
+                            Toast.makeText(getBaseContext(),"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                            travaView.changeLock();
+                        }
+
+                    }else
+                    {
+                        Toast.makeText(getBaseContext(),"Erro",Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }catch (Exception e)
+                {
+
+                }
+
+
+            }
+        });
+        builder1.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+
+                //LoginDialogFragment.this.getDialog().cancel();
+            }
+        });
+
+        //cria o AlertDialog
+        alert = builder.create();
+        //Exibe
+        alert.show();
+        return senhaUsuario;
+    }
+
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+
+        if (marker.equals(markerMaps))
+        {
+
+            AlertDialog alertDialog = new AlertDialog.Builder(PrincipalActivity.this).create();
+            alertDialog.setTitle("Estação Piloto");
+            alertDialog.setMessage("1 vaga disponível");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
+        return true;
+    }
+
+    private void effect(View view)
+    {
+        ObjectAnimator animate = ObjectAnimator.ofFloat(travaView,)
+    }
+
 
 }
