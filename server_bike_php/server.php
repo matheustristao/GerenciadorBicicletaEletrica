@@ -9,11 +9,6 @@ if (isset($_POST['numerofuncao'])) {
 
 //echo 'Numero funcao: ' .$numero_funcao. '  !!!';
 
-$SLND_ON = 1;
-$SLND_OFF = 2;
-$ERR_SLND_ON = 3;
-$ERR_SLND_ON = 4;
-
 
 $userDao     = new UsuarioDao();
 $usuario     = new Usuario();
@@ -238,8 +233,14 @@ class UsuarioDao
 
 class Usuario
 {
+
     
     static private $connection;
+
+    static private $SLND_ON = 1;
+    static private $SLND_OFF = 2;
+    static private $ERR_SLND_ON = 3;
+    static private $ERR_SLND_OFF = 4;
     
     private static function instanciaConnection()
     {
@@ -348,7 +349,7 @@ class Usuario
 
     public function insereFlag($flag)
     {   
-        instanciaConnection = self::instanciaConnection();
+        $instanciaConnection = self::instanciaConnection();
 
         $query_insert = "update `server_bike`.`SOLICITACAO` 
                                     set DATA_FECHAMENTO = SYSDATE(),
@@ -367,7 +368,7 @@ class Usuario
         criarSolicitacao(SLND_ON);
 
         //Tempo para Arduiino verificar se ha liberacao    
-        sleep(10);
+        // sleep(10);
         
         
         if (checkSolicitacao($estacao) == 0){
@@ -375,7 +376,7 @@ class Usuario
                 return 0;
             }
 
-        sleep(10);
+        // sleep(10);
 
         criarSolicitacao(SLND_OFF);
 
