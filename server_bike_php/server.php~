@@ -12,7 +12,6 @@ if (isset($_POST['numerofuncao'])) {
 $userDao     = new UsuarioDao();
 $usuario     = new Usuario();
 $userArduino = new Arduino();
-$ArduinoDao   = new ArduinoDao();
 
 switch ($numero_funcao) {
     case "1":
@@ -63,14 +62,6 @@ switch ($numero_funcao) {
 
         $userArduino->updateSolicitacao($tranca, $flag);
         break;
-
-     case "8":
-        $corrente = $_POST['corrente'];
-
-    
-        $ArduinoDao->insereDados($corrente);
-     break;   
-
 }
 
 //Classe responsável pela conexão com o banco
@@ -560,34 +551,6 @@ class Arduino
     
 }
 
-class ArduinoDao{
-    
-    static private $connection;
-    
-    private static function instanciaConnection()
-    {
-        
-        if (!isset(self::$connection)) {
-            self::$connection = new ConnectionFactory();
-        }
-        
-        return self::$connection;
-    }
-
-    public function insereDados($corrente){
-   
-        $instanciaConnection = self::instanciaConnection();
-
-        $query = "insert into BATERIA (
-                     CORRENTE
-                    ) VALUES ( 
-                     '$corrente');";
-    
-        $instanciaConnection->executaQuery($query);
-
-        echo "Dados da corrente inseridos com sucesso";
-  
-  }
 
 ?>
 
