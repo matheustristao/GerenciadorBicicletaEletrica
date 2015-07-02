@@ -7,12 +7,12 @@ if (isset($_POST['numerofuncao'])) {
 } else
     $numero_funcao = $_GET['numerofuncao'];
 
-//echo 'Numero funcao: ' .$numero_funcao. ' s !!!';
-
+//echo 'Numero funcao: ' .$numero_funcao. '  !!!';
 
 $userDao     = new UsuarioDao();
 $usuario     = new Usuario();
 $userArduino = new Arduino();
+$ArduinoDao   = new ArduinoDao();
 
 switch ($numero_funcao) {
     case "1":
@@ -59,10 +59,18 @@ switch ($numero_funcao) {
         //$flag   = $_GET['flag'];
         
         $tranca = $_POST['tranca'];
-        $flag   = $_POST['flag'];
-        
+        $flag  = $_POST['flag'];
+
         $userArduino->updateSolicitacao($tranca, $flag);
         break;
+
+     case "8":
+        $corrente = $_POST['corrente'];
+
+    
+        $ArduinoDao->insereDados($corrente);
+     break;   
+
 }
 
 //Classe responsável pela conexão com o banco
@@ -189,16 +197,18 @@ class UsuarioDao
             P.NOME,
             P.SOBRENOME,
             P.EMAIL,
-            P.TELEFONE 
-                from  USUARIO P
+            P.TELEFONE,
+            B.CORRENTE 
+                from  USUARIO P, BATERIA B
                 where 
                     P.EMAIL like '$email'
+                 and B.idBATERIA like (select max(idBATERIA) from BATERIA)   
                 ";
         
         $lista = $instanciaConnection->listData($query);
         
         $obj = $lista->fetch_object();
-        echo "{ 'Nome' : '" . $obj->NOME . "', 'Sobrenome' : '" . $obj->SOBRENOME . "', 'Email' : '" . $obj->EMAIL . "', 'Telefone' : '" . $obj->TELEFONE . "' } ";
+        echo "{ 'Nome' : '" . $obj->NOME . "', 'Sobrenome' : '" . $obj->SOBRENOME . "', 'Email' : '" . $obj->EMAIL . "', 'Telefone' : '" . $obj->TELEFONE . "', 'Corrente' : '" . $obj->CORRENTE ."'}";
         
         return $obj;
     }
@@ -498,14 +508,14 @@ class Arduino
     public function checkSolicitacao()
     {
         
-        
-        
+
+
         $instanciaConnection = self::instanciaConnection();
         
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null;";
         
         $idtipo = $instanciaConnection->listData($query_solicitacao);
-        
+
         $contagem = $idtipo->num_rows;
         
         //Solicitação não pode ser feita e sai da função
@@ -513,18 +523,18 @@ class Arduino
             //echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
             echo "@0";
             
-            
+
             return 0;
         }
         //echo "dbg: posso checar: contagem=n" . $contagem;
-        
+
         while ($row = mysqli_fetch_array($idtipo)) {
-            
-            //echo "passei idtipo= " . $row['ID_TIPO'];
-            
-            echo "@" . $row['ID_TIPO'];
-            // echo "@3";  
-            return 1;
+
+        //echo "passei idtipo= " . $row['ID_TIPO'];
+
+        echo "@" . $row['ID_TIPO'];
+         // echo "@3";  
+        return 1;
         }
     }
     
@@ -558,7 +568,7 @@ class Arduino
             $instanciaConnection->executaQuery($query_insert);
             
             //echo "dbg: caso com flag=" . $flag;
-            
+
             echo "@-";
             
             return -1;
@@ -575,14 +585,45 @@ class Arduino
         $instanciaConnection->executaQuery($query_insert);
         //echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
         
-        
-        echo "@1";
-        
+
+         echo "@1";
+
         return 0;
     }
     
     
 }
 
+class ArduinoDao{
+    
+    static private $connection;
+    
+    private static function instanciaConnection()
+    {
+        
+        if (!isset(self::$connection)) {
+            self::$connection = new ConnectionFactory();
+        }
+        
+        return self::$connection;
+    }
+
+    public function insereDados($corrente){
+   
+        $instanciaConnection = self::instanciaConnection();
+
+        $query = "insert into BATERIA (
+                     CORRENTE
+                    ) VALUES ( 
+                     '$corrente');";
+    
+        $instanciaConnection->executaQuery($query);
+
+        echo "Dados da corrente inseridos com sucesso";
+  
+  }
+
+}
 
 ?>
+
