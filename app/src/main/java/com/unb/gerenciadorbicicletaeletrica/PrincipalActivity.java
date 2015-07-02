@@ -45,6 +45,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+//Animacoes
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 /**
  * Created by Ramon on 5/16/15.
@@ -168,7 +171,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                     public void run() {
 
                         EditText etemail = loginView.getTf_email();
-                        EditText etsenha = loginView.getTf_senha();
+                        final EditText etsenha = loginView.getTf_senha();
 
                         email_logado = etemail.getText().toString();
 
@@ -185,6 +188,13 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                         } else {
                             runOnUiThread(new Runnable() {
                                 public void run() {
+
+                                    YoYo.with(Techniques.Tada)
+                                            .duration(700)
+                                            .playOn(etsenha);
+
+                                    etsenha.setText("Wrong password!");
+
                                     email_logado=null;
                                     usuario=null;
                                     Toast.makeText(getBaseContext(), "Login não efetuado: Usuario e/ou senha incorretos", Toast.LENGTH_SHORT).show();
@@ -643,10 +653,6 @@ private void removeMap()
         return true;
     }
 
-    private void effect(View view)
-    {
-        ObjectAnimator animate = ObjectAnimator.ofFloat(travaView,)
-    }
 
 
 }
