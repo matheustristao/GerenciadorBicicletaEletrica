@@ -197,16 +197,18 @@ class UsuarioDao
             P.NOME,
             P.SOBRENOME,
             P.EMAIL,
-            P.TELEFONE 
-                from  USUARIO P
+            P.TELEFONE,
+            B.CORRENTE 
+                from  USUARIO P, BATERIA B
                 where 
                     P.EMAIL like '$email'
+                 and B.idBATERIA like (select max(idBATERIA) from BATERIA)   
                 ";
         
         $lista = $instanciaConnection->listData($query);
         
         $obj = $lista->fetch_object();
-        echo "{ 'Nome' : '" . $obj->NOME . "', 'Sobrenome' : '" . $obj->SOBRENOME . "', 'Email' : '" . $obj->EMAIL . "', 'Telefone' : '" . $obj->TELEFONE . "' } ";
+        echo "{ 'Nome' : '" . $obj->NOME . "', 'Sobrenome' : '" . $obj->SOBRENOME . "', 'Email' : '" . $obj->EMAIL . "', 'Telefone' : '" . $obj->TELEFONE . "', 'Corrente' : '" . $obj->CORRENTE ."'}";
         
         return $obj;
     }
@@ -588,6 +590,8 @@ class ArduinoDao{
         echo "Dados da corrente inseridos com sucesso";
   
   }
+
+}
 
 ?>
 

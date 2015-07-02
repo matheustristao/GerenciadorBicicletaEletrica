@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -186,6 +187,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                              configuraEventosToolbarBottom(context);
                              usuario=conectionFactory.getDadosUsuarioHttp(email_logado);
 
+                              Log.e("teste bateria", usuario.getCorrente());
+
                         } else {
                             runOnUiThread(new Runnable() {
                                 public void run() {
@@ -292,26 +295,33 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
     private void informacoes(final Context context)
     {
+
         if(logado==null)
         {
             bloqueiaEventosToolbarBottom(context);
             return;
         }
-
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
-        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
 
 
 //        Toast.makeText(context,"Tranca",Toast.LENGTH_SHORT).show();
-        infoView=new DataView(context);
+        infoView=(infoView==null)? new DataView(context):infoView;
         infoView.setLayoutParams(params);
-        infoView.addInfo(usuario.getNome(),usuario.getEmail(),usuario.getTelefone());
+        infoView.addInfo(usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getCorrente());
 
-              //  infoView.addInfo(response.getNome(),response.getEmail(),response.getTelefone());
+        //  infoView.addInfo(response.getNome(),response.getEmail(),response.getTelefone());
 
-        rlayout.addView(infoView);
 
-        Toast.makeText(context,"informacoes ",Toast.LENGTH_SHORT).show();
+        this.runOnUiThread(new Runnable() {
+
+            public void run() {
+                rlayout.addView(infoView);
+            }
+        });
+
+
+
 
     }
     private void trava(final Context context)
@@ -435,12 +445,14 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
                 try
                 {
+
                     popViews();
+
                     informacoes(context);
 
                 }catch (Exception e)
                 {
-
+                  e.printStackTrace();
                 }
 
 

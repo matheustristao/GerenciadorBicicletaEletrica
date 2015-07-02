@@ -11,15 +11,17 @@ public class Usuario implements Serializable{
     private String email;
     private String telefone;
     private String senha;
+    private String corrente;
 
     public Usuario() {
     }
 
-    public Usuario(String nome, String sobrenome, String email, String telefone) {
+    public Usuario(String nome, String sobrenome, String email, String telefone, String corrente) {
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.email = email;
         this.telefone = telefone;
+        this.corrente = corrente;
     }
 
     public String getNome() {
@@ -60,5 +62,13 @@ public class Usuario implements Serializable{
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public String getCorrente() {
+        return corrente;
+    }
+
+    public void setCorrente(String corrente) {
+        this.corrente = corrente;
     }
 }
