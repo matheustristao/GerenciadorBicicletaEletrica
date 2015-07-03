@@ -1,3 +1,4 @@
+DROP SCHEMA server_bike;
 CREATE DATABASE  IF NOT EXISTS `server_bike` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
 USE `server_bike`;
 
