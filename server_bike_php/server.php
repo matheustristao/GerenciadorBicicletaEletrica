@@ -70,8 +70,7 @@ switch ($numero_funcao) {
         break;
     
     case "9":
-        $email = $_POST['email'];
-        $usuario->checkVaga($email, 2);
+        $usuario->checkVaga($_POST['email'], 2);
         break;
         
         
