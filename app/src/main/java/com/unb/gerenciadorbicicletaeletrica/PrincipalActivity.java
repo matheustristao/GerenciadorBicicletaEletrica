@@ -82,6 +82,9 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
     private SupportMapFragment mMapFragment;
     private Marker markerMaps;//Marcador no mapa
 
+    private boolean podeVerMapa; //Variavel utilizada para amarrar a visualizacao
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -91,6 +94,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         setContentView(R.layout.activity_principal);
         upperToolBar = (Toolbar) findViewById(R.id.tb_main);
         upperToolBar.inflateMenu(R.menu.menu_main);
+        podeVerMapa=false;
 
         upperToolBar.setOnMenuItemClickListener(
                 new Toolbar.OnMenuItemClickListener() {
@@ -182,9 +186,16 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
                         if (logado.equals("loguei")) {
 
-                             trava(context);
-                             configuraEventosToolbarBottom(context);
-                             usuario=conectionFactory.getDadosUsuarioHttp(email_logado);
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+
+                                    popViews();
+                                    addMap();
+                                    configuraEventosToolbarBottom(context);
+
+                                }
+                            });
+                            usuario=conectionFactory.getDadosUsuarioHttp(email_logado);
 
                         } else {
                             runOnUiThread(new Runnable() {
@@ -322,6 +333,19 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
             return;
         }
 
+        AlertDialog alertDialog= new AlertDialog.Builder(PrincipalActivity.this).create();
+        alertDialog.setTitle("Aviso");
+        alertDialog.setMessage("Você Precisa escolher primeiro uma estação");
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,"OK",
+                new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which) {
+                        addMap();
+                        return;
+                    }
+                });
+        alertDialog.show();
+
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
@@ -406,6 +430,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                 try
                 {
                     popViews();
+
                     trava(context);
 
                 }catch (Exception e)
@@ -520,7 +545,7 @@ private void addMap()
     map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
     mMapFragment.getView().setVisibility(View.VISIBLE);
 
-    map.setOnMarkerClickListener(this);
+    map.setOnMarkerClickListener(PrincipalActivity.this);
 
 //Mostra opcoes de mapa no menu
     upperToolBar.getMenu().findItem(R.id.mapa).setVisible(true);
@@ -663,20 +688,34 @@ private void removeMap()
     @Override
     public boolean onMarkerClick(final Marker marker) {
 
-        if (marker.equals(markerMaps))
-        {
 
             AlertDialog alertDialog = new AlertDialog.Builder(PrincipalActivity.this).create();
             alertDialog.setTitle("Estação Piloto");
-            alertDialog.setMessage("1 vaga disponível");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+            alertDialog.setMessage("1 vaga disponível\nDeseja utiliza-la?");
+
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,"SIM",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
+                         podeVerMapa=true;
+                          trava(getBaseContext());
                         }
                     });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"NÃO",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+//            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            dialog.dismiss();
+//                        }
+//                    });
             alertDialog.show();
-        }
+
         return true;
     }
 
