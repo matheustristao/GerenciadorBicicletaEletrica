@@ -4,13 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.unb.gerenciadorbicicletaeletrica.ConectionFactory;
 import com.unb.gerenciadorbicicletaeletrica.MainActivity;
@@ -31,6 +28,7 @@ public class TravaView  extends RelativeLayout {
     private TextView tv_email;
     private TextView tv_nome;
     private TextView tv_telefone;
+    private TextView tv_mensagem;
     private Context context;
 
 
@@ -44,6 +42,10 @@ public class TravaView  extends RelativeLayout {
         setBtn_trava(new ImageButton(context));
         getBtn_trava().setY(300);
         getBtn_trava().setLayoutParams(alinhamento);
+
+        setTv_mensagem(new TextView(context));
+        getTv_mensagem().setY(300);
+        getTv_mensagem().setLayoutParams(alinhamento);
 
 
 
@@ -140,5 +142,14 @@ public class TravaView  extends RelativeLayout {
 
             }
         }.start();
+    }
+
+    public TextView getTv_mensagem() {
+        return tv_mensagem;
+    }
+
+    public void setTv_mensagem(TextView tv_mensagem) {
+
+        this.tv_mensagem = tv_mensagem;
     }
 }

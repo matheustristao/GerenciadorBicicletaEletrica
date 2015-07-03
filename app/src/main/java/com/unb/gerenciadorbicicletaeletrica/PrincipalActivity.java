@@ -1,6 +1,5 @@
 package com.unb.gerenciadorbicicletaeletrica;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
@@ -13,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -70,6 +68,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
     private AlertDialog alert;
 
+
     //MAPa
     private LatLng location = new LatLng(-15.988267,  -48.044216);
 
@@ -80,6 +79,11 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
     private boolean podeUsarCadeado; //Variavel utilizada para amarrar a visualizacao
     private boolean requisicaoAssincronaAtivada;
     Timer timer;
+
+    String situacaoVagas;
+    static final String VAGA_DISPONIVEL="1";
+    static final String VAGA_OCUPADA_PELO_USUARIO="2";
+    static final String VAGA_INDISPONIVEL="0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -92,6 +96,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         upperToolBar.inflateMenu(R.menu.menu_main);
         podeUsarCadeado =false;
         requisicaoAssincronaAtivada=false;
+        situacaoVagas =null;
 
         upperToolBar.setOnMenuItemClickListener(
                 new Toolbar.OnMenuItemClickListener() {
@@ -122,7 +127,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                         if(id==R.id.hibrido)
                         {
                             map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                            verificaVaga(email_logado);
+
+                            Toast.makeText(getBaseContext(),"Qtd Vagas "+ situacaoVagas,Toast.LENGTH_SHORT).show();
 
                         }
 
@@ -133,9 +139,9 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         solicitaLogin(this);
 
 
-     configuraEventosToolbarBottom(this);
-        logado="ramon";
-        podeUsarCadeado=true;
+//     configuraEventosToolbarBottom(this);
+//        logado="ramon";
+//        podeUsarCadeado=true;
 
     }
 
@@ -349,16 +355,16 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
             return;
         }
 
-        if(podeUsarCadeado)
+        if(podeUsarCadeado && situacaoVagas !=null && situacaoVagas !=VAGA_INDISPONIVEL)
         {
             rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
             params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
             if(travaView==null) travaView=new TravaView(context);
 
-
-            String teste = conectionFactory.verificaVagaHttp(email_logado);
-            Toast.makeText(getBaseContext(),"QTD Vagas:"+teste,Toast.LENGTH_SHORT).show();
+            //Verifico se existe vagas disponiveis
+            if(situacaoVagas.equalsIgnoreCase(VAGA_DISPONIVEL))travaView.setLock(false);
+            if(situacaoVagas.equalsIgnoreCase(VAGA_OCUPADA_PELO_USUARIO))travaView.setLock(true);
 
             travaView.setLayoutParams(params);
             travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
@@ -512,6 +518,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
                 try
                 {
+
+
                    popViews();
                    addMap();
 
@@ -556,6 +564,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 //
 private void addMap()
 {
+    String mensagemVagas=null;
+
     FragmentManager fm = getFragmentManager();
    // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
     mMapFragment = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map));
@@ -563,17 +573,51 @@ private void addMap()
 
    // map.addMarker(new MarkerOptions().position(location).title("Posto de recarga Piloto"));
 
-    markerMaps = map.addMarker(new MarkerOptions()
-            .position(location)
-            .title("Posto de recarga Piloto")
-            .snippet("1 Vaga dispoível")
-           );
+    try
+    {
+        if(situacaoVagas.equals(VAGA_DISPONIVEL) && situacaoVagas!=null)
+        {
+            mensagemVagas="1 Vaga dispoível";
+            map.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title("Posto de recarga Piloto")
+                            .snippet(mensagemVagas)
+            );
+            map.setOnMarkerClickListener(PrincipalActivity.this);
+
+        }
+        if(situacaoVagas.equals(VAGA_INDISPONIVEL) && situacaoVagas!=null)
+        {
+            mensagemVagas=" Não há Vaga dispoível";
+            map.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title("Posto de recarga Piloto")
+                            .snippet(mensagemVagas)
+            );
+        }
+        if(situacaoVagas.equals(VAGA_OCUPADA_PELO_USUARIO)&& situacaoVagas!=null)
+        {
+            mensagemVagas=" Deseja desocupar a vaga?";
+            map.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title("Posto de recarga Piloto")
+                            .snippet(mensagemVagas)
+            );
+            map.setOnMarkerClickListener(PrincipalActivity.this);
+        }
+
+    }catch (Exception e)
+    {
+        QtdVagaTask vagas = new QtdVagaTask();
+        vagas.execute();
+    }
+
 
     map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 20));
     map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
     mMapFragment.getView().setVisibility(View.VISIBLE);
 
-    map.setOnMarkerClickListener(PrincipalActivity.this);
+
 
 //Mostra opcoes de mapa no menu
     upperToolBar.getMenu().findItem(R.id.mapa).setVisible(true);
@@ -717,41 +761,67 @@ private String validarSenha() {
 
         return senhaUsuario;
     }
-
-
-
-
     @Override
     public boolean onMarkerClick(final Marker marker) {
 
 
-            AlertDialog alertDialog = new AlertDialog.Builder(PrincipalActivity.this).create();
-            alertDialog.setTitle("Estação Piloto");
-            alertDialog.setMessage("1 vaga disponível\nDeseja utiliza-la?");
+          String mensagem=null;
+          AlertDialog alertDialog = new AlertDialog.Builder(PrincipalActivity.this).create();
+          if(situacaoVagas.equals(VAGA_DISPONIVEL))
+          {
+              mensagem="1 vaga disponível\nDeseja utiliza-la?";
 
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SIM",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            podeUsarCadeado=true;
-                            trava(getBaseContext());
-                        }
-                    });
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"NÃO",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        podeUsarCadeado=false;
-                        dialog.dismiss();
-                    }
-                });
+              alertDialog.setTitle("Estação Piloto");
+              alertDialog.setMessage(mensagem);
 
+              alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SIM",
+                      new DialogInterface.OnClickListener() {
+                          public void onClick(DialogInterface dialog, int which) {
+                              podeUsarCadeado=true;
+                              trava(getBaseContext());
+                          }
+                      });
+              alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"NÃO",
+                      new DialogInterface.OnClickListener() {
+                          public void onClick(DialogInterface dialog, int which) {
+                              podeUsarCadeado=false;
+                              dialog.dismiss();
+                          }
+                      });
 
-//            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-//                    new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            dialog.dismiss();
-//                        }
-//                    });
-            alertDialog.show();
+          }
+            if(situacaoVagas.equals(VAGA_OCUPADA_PELO_USUARIO))
+            {
+                mensagem="Deseja desocupar a vaga?";
+               
+
+                alertDialog.setTitle("Estação Piloto");
+                alertDialog.setMessage(mensagem);
+
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SIM",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                podeUsarCadeado=true;
+                                trava(getBaseContext());
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"NÃO",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                podeUsarCadeado=false;
+                                dialog.dismiss();
+                            }
+                        });
+            }
+            if(situacaoVagas.equals(VAGA_INDISPONIVEL))
+            {
+                mensagem="não há vaga disponível";
+                alertDialog.setTitle("Estação Piloto");
+                alertDialog.setMessage(mensagem);
+
+            }
+
+        alertDialog.show();
 
         return true;
     }
@@ -773,6 +843,9 @@ public void atualizaValorCorrente() {
                                   {
                                        CorrenteAsync corrente=new CorrenteAsync();
                                         corrente.execute();
+
+                                      QtdVagaTask verificaVagas=new QtdVagaTask();
+                                      verificaVagas.execute();
                                   } catch (Exception e)
                                   {
 
@@ -819,6 +892,7 @@ public void atualizaValorCorrente() {
                             {
                                 Toast.makeText(getBaseContext(),"Resposta "+respost,Toast.LENGTH_SHORT).show();
 
+
                             }catch (Exception e)
                             {
                                 e.printStackTrace();
@@ -831,27 +905,42 @@ public void atualizaValorCorrente() {
             }
 
         }.start();
+
     }
     //Inner Class
 
-private class QtdVagaTask extends  AsyncTask<String,Void,String> {
+private class QtdVagaTask extends  AsyncTask<Void,Void,String> {
 
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected String doInBackground(Void... voids) {
 
+
+        String qtd=null;
 
         try
         {
-            
+            qtd=conectionFactory.verificaVagaHttp(email_logado);
+
+
         } catch (Exception e)
         {
             e.printStackTrace();
         }
-        return null;
+        return qtd;
+
     }
 
     protected void onPostExecute(String result) {
+
+        try
+        {
+              situacaoVagas =result;
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
     }
 }
