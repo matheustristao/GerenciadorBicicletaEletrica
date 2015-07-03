@@ -122,9 +122,9 @@ class UsuarioDao
     private static function instanciaConnection()
     {
         
-        if (!isset(self::$connection)) {
-            self::$connection = new ConnectionFactory();
-        }
+       
+    self::$connection = new ConnectionFactory();
+        
         
         return self::$connection;
     }
@@ -254,13 +254,13 @@ class Usuario
         
         return self::$connection;
     }
+
     
     public function habilitar_vaga($senha, $estacao)
     {
         $instanciaConnection = self::instanciaConnection();
         
         $userDao = new UsuarioDao();
-        
         
         
         if ($userDao->checkLoginHash($senha) == 0) {
@@ -284,7 +284,9 @@ class Usuario
         
         if (self::checkVaga($senha) == 1) {
             
-            self::acionaArduino($estacao);
+            self::acionaArduino($estacao, 1);
+
+            self::acionaArduino($estacao, 2);
             
             
             $query_insert = "insert into USUARIO_ESTACAO
@@ -302,6 +304,8 @@ class Usuario
                             where  USUARIO.SENHA like '$senha';";
             
             $instanciaConnection->executaQuery($query_insert);
+
+
             
             
             echo "Solicitacao de acesso aprovada";
@@ -312,10 +316,33 @@ class Usuario
         
     }
     
+
+    
+
+    public function acionaArduino($estacao, $solicitacao)
+    {
+        $flag = 0;
+
+        if ($solicitacao == 1) {
+            $flag = 3;
+        }else{
+            $flag = 4;
+        }
+
+        self::criarSolicitacao($solicitacao);
+
+        sleep(10);
+        
+        if (self::checkSolicitacao($estacao) == 0) {
+            self::insereFlag($flag,$solicitacao);
+            return 0;
+        }
+        
+    }
+    
     public function criarSolicitacao($tipo_solicitacao)
     {
         $instanciaConnection = self::instanciaConnection();
-        //Solicitacao do tipo 1
         
         $solicitacao = "insert into SOLICITACAO 
                             (DATA_ABERTURA, 
@@ -328,7 +355,7 @@ class Usuario
         
         $instanciaConnection->executaQuery($solicitacao);
     }
-    
+
     public function checkSolicitacao($estacao)
     {
         $instanciaConnection = self::instanciaConnection();
@@ -344,6 +371,8 @@ class Usuario
         while ($row = mysqli_fetch_array($result_solicitacao)) {
             $max_id_solicitacao = $row['maxid'];
         }
+
+        echo "MAX ID FOI: " . $max_id_solicitacao;
         
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is not null and idSOLICITACAO = '$max_id_solicitacao';";
         
@@ -353,14 +382,14 @@ class Usuario
         
     }
     
-    public function insereFlag($flag)
+    public function insereFlag($flag,$id_tipo)
     {
         $instanciaConnection = self::instanciaConnection();
         
         $query_insert = "update `server_bike`.`SOLICITACAO` 
                                     set DATA_FECHAMENTO = SYSDATE(),
                                     FLAG_ERRO = '$flag',
-                                    id_tipo = 1
+                                    id_tipo = '$id_tipo'
                                     where DATA_FECHAMENTO is null;";
         
         
@@ -368,30 +397,7 @@ class Usuario
         
         echo 'Solicitacao nao atendida pelo arduino';
     }
-    
-    public function acionaArduino($estacao)
-    {
-        criarSolicitacao(1);
-        
-        //Tempo para Arduiino verificar se ha liberacao    
-        sleep(10);
-        
-        
-        if (self::checkSolicitacao($estacao) == 0) {
-            self::insereFlag(3);
-            return 0;
-        }
-        
-        sleep(10);
-        
-        self::criarSolicitacao(2);
-        
-        if (self::checkSolicitacao($estacao) == 0) {
-            self::insereFlag(4);
-            return 0;
-        }
-    }
-    
+
     public function retirar_bike($senha, $estacao)
     {
         
