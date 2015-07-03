@@ -156,7 +156,7 @@ public class ConectionFactory {
 
             json = new JSONObject(serverString);
 
-            usuario = new Usuario(json.getString("Nome"), json.getString("Sobrenome"), json.getString("Email"), json.getString("Telefone"));
+            usuario = new Usuario(json.getString("Nome"), json.getString("Sobrenome"), json.getString("Email"), json.getString("Telefone"), json.getString("Corrente"));
 
             return usuario;
 

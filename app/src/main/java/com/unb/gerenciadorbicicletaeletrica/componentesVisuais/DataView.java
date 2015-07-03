@@ -16,6 +16,8 @@ public class DataView extends RelativeLayout {
     private TextView tv_email;
     private TextView tv_nome;
     private TextView tv_telefone;
+    private TextView tv_corrente;
+
     public DataView(Context context) {
         super(context);
 
@@ -43,21 +45,29 @@ public class DataView extends RelativeLayout {
         this.getTv_telefone().setTextColor(Color.BLACK);
         this.getTv_telefone().setY(this.getTv_email().getY() + 50);
 
+        this.setTv_corrente(new TextView(context));
+        this.getTv_corrente().setText("Corrente:");
+        this.getTv_corrente().setTextSize(25);
+        this.getTv_corrente().setLayoutParams(alinhamento);
+        this.getTv_corrente().setTextColor(Color.BLACK);
+        this.getTv_corrente().setY(this.getTv_telefone().getY() + 50);
 
         this.addView(this.getTv_nome());
         this.addView(this.getTv_email());
         this.addView(this.getTv_telefone());
+        this.addView(this.getTv_corrente());
     }
 
     public DataView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public void addInfo(String nome, String email,String telefone)
+    public void addInfo(String nome, String email,String telefone, String corrente)
     {
         this.tv_nome.setText("Nome :"+nome);
         this.tv_email.setText("E-mail :"+email);
         this.tv_telefone.setText("Telefone :"+telefone);
+        this.getTv_corrente().setText("Corrente: " +corrente);
     }
     public TextView getTv_email() {
         return tv_email;
@@ -81,5 +91,13 @@ public class DataView extends RelativeLayout {
 
     public void setTv_telefone(TextView tv_telefone) {
         this.tv_telefone = tv_telefone;
+    }
+
+    public TextView getTv_corrente() {
+        return tv_corrente;
+    }
+
+    public void setTv_corrente(TextView tv_corrente) {
+        this.tv_corrente = tv_corrente;
     }
 }
