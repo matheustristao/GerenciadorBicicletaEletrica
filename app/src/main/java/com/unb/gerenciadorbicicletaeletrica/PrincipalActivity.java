@@ -1,11 +1,7 @@
 package com.unb.gerenciadorbicicletaeletrica;
 
-import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -15,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -24,13 +19,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.CadastroView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.DataView;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.LoginView;
-import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.Tela_cadastro;
 import com.unb.gerenciadorbicicletaeletrica.componentesVisuais.TravaView;
-import  android.text.*;
+
 import  android.widget.RelativeLayout.LayoutParams;
-import  android.R.*;
 import android.widget.Toast;
-import android.view.inputmethod.*;
 import android.app.AlertDialog;
 import  android.content.*;
 
@@ -40,12 +32,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import android.os.Bundle;
-import android.support.v7.app.*;
-import android.app.Fragment;
+
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 //Animacoes
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -83,7 +71,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
     private SupportMapFragment mMapFragment;
     private Marker markerMaps;//Marcador no mapa
 
-    private boolean podeVerMapa; //Variavel utilizada para amarrar a visualizacao
+    private boolean podeUsarCadeado; //Variavel utilizada para amarrar a visualizacao
 
 
     @Override
@@ -95,7 +83,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         setContentView(R.layout.activity_principal);
         upperToolBar = (Toolbar) findViewById(R.id.tb_main);
         upperToolBar.inflateMenu(R.menu.menu_main);
-        podeVerMapa=false;
+        podeUsarCadeado =false;
 
         upperToolBar.setOnMenuItemClickListener(
                 new Toolbar.OnMenuItemClickListener() {
@@ -343,45 +331,54 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
             return;
         }
 
-        AlertDialog alertDialog= new AlertDialog.Builder(PrincipalActivity.this).create();
-        alertDialog.setTitle("Aviso");
-        alertDialog.setMessage("Você Precisa escolher primeiro uma estação");
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,"OK",
-                new DialogInterface.OnClickListener()
+        if(podeUsarCadeado)
+        {
+            rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
+            params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+
+            if(travaView==null) travaView=new TravaView(context);
+
+
+            travaView.setLayoutParams(params);
+            travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    validarSenha();
+
+                }
+            });
+
+
+            popViews();
+
+            this.runOnUiThread(new Runnable() {
+
+                public void run()
                 {
-                    public void onClick(DialogInterface dialog, int which) {
-                        addMap();
-                        return;
-                    }
-                });
-        alertDialog.show();
+                    rlayout.addView(travaView);
+                }
+            });
 
-        rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
-        params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
+        }else
+        {
+            AlertDialog alertDialog= new AlertDialog.Builder(PrincipalActivity.this).create();
+            alertDialog.setTitle("Aviso");
+            alertDialog.setMessage("Você Precisa escolher primeiro uma estação");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL,"OK",
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int which) {
+                            addMap();
 
-        if(travaView==null) travaView=new TravaView(context);
-
-  
-        travaView.setLayoutParams(params);
-        travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                validarSenha();
-
-            }
-        });
+                        }
+                    });
+            alertDialog.show();
+        }
 
 
-        popViews();
 
-        this.runOnUiThread(new Runnable() {
 
-            public void run()
-            {
-                rlayout.addView(travaView);
-            }
-        });
 
     }
     private void bloqueiaEventosToolbarBottom(final  Context context)
@@ -419,7 +416,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
             @Override
             public void onClick(View view) {
                 popViews();
-                solicitaLogin(context);
+                loadMap();
             }
 
         });
@@ -494,7 +491,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
                 try
                 {
-                    popViews();
+                   popViews();
                    addMap();
 
                 }catch (Exception e)
@@ -566,6 +563,21 @@ private void addMap()
 
    // MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.iconMarker));
 }
+    private void loadMap()
+    {
+        FragmentManager fm = getFragmentManager();
+        // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        mMapFragment = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map));
+        map = mMapFragment.getMap();
+
+    //  map.addMarker(new MarkerOptions().position(location).title("Posto de recarga Piloto"));
+//      map.addCircle(new CircleOptions().center(location).radius(1.0));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 20));
+        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        mMapFragment.getView().setVisibility(View.VISIBLE);
+
+
+    }
 
 private void removeMap()
 {
@@ -578,7 +590,7 @@ private void removeMap()
 }
 //Inner Class
 
-    private class CadastroAsync extends AsyncTask<String,Void,String>
+private class CadastroAsync extends AsyncTask<String,Void,String>
     {
 
         @Override
@@ -590,7 +602,7 @@ private void removeMap()
     }
 
 
-    private String validarSenha() {
+private String validarSenha() {
 
 
         final EditText[] edit = {null};
@@ -630,6 +642,7 @@ private void removeMap()
                                     public void run() {
 
 
+                                        podeUsarCadeado =true;
 
                                         if(travaView.isLock())
                                         {
@@ -657,6 +670,7 @@ private void removeMap()
                                 runOnUiThread(new Runnable() {
                                     public void run() {
 
+                                        podeUsarCadeado=false;
                                         Toast.makeText(getBaseContext(),"Senha incorreta",Toast.LENGTH_SHORT).show();
                                         YoYo.with(Techniques.Tada)
                                                 .duration(700)
@@ -705,16 +719,17 @@ private void removeMap()
             alertDialog.setTitle("Estação Piloto");
             alertDialog.setMessage("1 vaga disponível\nDeseja utiliza-la?");
 
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,"SIM",
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SIM",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                         podeVerMapa=true;
-                          trava(getBaseContext());
+                            podeUsarCadeado=true;
+                            trava(getBaseContext());
                         }
                     });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"NÃO",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        podeUsarCadeado=false;
                         dialog.dismiss();
                     }
                 });
