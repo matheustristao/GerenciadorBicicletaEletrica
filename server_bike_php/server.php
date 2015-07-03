@@ -42,7 +42,7 @@ switch ($numero_funcao) {
         $estacao       = $_POST['estacao'];
         $senha_usuario = $_POST['senha'];
         
-        $usuario->retirar_bike($senha_usuario, $estacao);
+        $usuario->habilitar_vaga($senha_usuario, $estacao);
         break;
     case "5":
         $email = $_GET['email'];
@@ -122,9 +122,9 @@ class UsuarioDao
     private static function instanciaConnection()
     {
         
-        if (!isset(self::$connection)) {
-            self::$connection = new ConnectionFactory();
-        }
+       
+    self::$connection = new ConnectionFactory();
+        
         
         return self::$connection;
     }
@@ -244,6 +244,7 @@ class UsuarioDao
 class Usuario
 {
     
+    
     static private $connection;
     
     private static function instanciaConnection()
@@ -253,6 +254,7 @@ class Usuario
         
         return self::$connection;
     }
+
     
     public function habilitar_vaga($senha, $estacao)
     {
@@ -260,12 +262,11 @@ class Usuario
         
         $userDao = new UsuarioDao();
         
-
-
+        
         if ($userDao->checkLoginHash($senha) == 0) {
             echo "Liberação não autorizada: Senha não reconhecida";
             return -1;
-        } 
+        }
         
         //Checagem de solicitação aberta
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null or FLAG_ERRO is not null;";
@@ -281,60 +282,24 @@ class Usuario
             return -2;
         }
         
-        if (self::checkVaga($senha) == 1) {
+        $retornoCheckVaga = self::checkVaga($senha);
 
-        //Solicitacao do tipo 1
-
-        $solicitacao = "insert into SOLICITACAO 
-                            (DATA_ABERTURA, 
-                             ID_ARDUINO,
-                             ID_TIPO)
-                             VALUES
-                             (SYSDATE(),
-                              1,
-                              1)";
-        
-        $instanciaConnection->executaQuery($solicitacao);
-        
-        //Tempo para Arduiino verificar se ha liberacao    
-        sleep(10);
-        
-        
-        $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
-        
-        $id_estacao = $instanciaConnection->listData($query_busca);
-        
-        
-
-            $query_id_max_solicitacao = "select max(idSOLICITACAO) as maxid from SOLICITACAO;";
-
-            $result_solicitacao = $instanciaConnection->listData($query_id_max_solicitacao);
-
-            while ($row = mysqli_fetch_array($result_solicitacao)) {
-                $max_id_solicitacao = $row['maxid'];
-            }
+        if ($retornoCheckVaga== 0) {
             
-            $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is not null and idSOLICITACAO = '$max_id_solicitacao';";
-        
-            $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
+            echo "Nada a fazer";
+
+            return 0;
+        }
+
+            self::acionaArduino($estacao, 2);
+            self::acionaArduino($estacao, 1);
+
+        if ($retornoCheckVaga == 1) {
+                   // self::acionaArduino($estacao, 1);
+
+     
+
             
-            $contagem = $result_solicitacao->num_rows;
-
-            if ($contagem == 0){
-
-             $query_insert = "update `server_bike`.`SOLICITACAO` 
-                                    set DATA_FECHAMENTO = SYSDATE(),
-                                    FLAG_ERRO = 3,
-                                    id_tipo = 1
-                                    where DATA_FECHAMENTO is null;";
-            
-            
-                $instanciaConnection->executaQuery($query_insert);
-
-                echo 'Solicitacao nao atendida pelo arduino';
-                return 0;
-            }
-
             $query_insert = "insert into USUARIO_ESTACAO
                                 (USUARIO_ID_USUARIO,
                                  ESTACAO_ID_ESTACAO,
@@ -350,41 +315,54 @@ class Usuario
                             where  USUARIO.SENHA like '$senha';";
             
             $instanciaConnection->executaQuery($query_insert);
-            
+
+
             echo "Solicitacao de acesso aprovada";
             
         } 
-        else {
-            echo "Essa vaga está ocupada!";
+
+        if ($retornoCheckVaga == 2) {
+             //  self::acionaArduino($estacao, 2);
+
+            $query_insert = "update USUARIO_ESTACAO set 
+                                HORA_FIM = SYSDATE()
+                                where HORA_FIM is null
+                                and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
+            
+            $instanciaConnection->executaQuery($query_insert);
+            
+            echo "Vaga liberada para novo uso, pode retirar a bike";
         }
         
     }
     
-    public function retirar_bike($senha, $estacao)
-    {
-        
-        $instanciaConnection = self::instanciaConnection();
-        
-        $userDao = new UsuarioDao();
 
-        if ($userDao->checkLoginHash($senha) == 0) {
-            echo "Liberação não autorizada: Senha não reconhecida";
-            return -1;
+    
+
+    public function acionaArduino($estacao, $solicitacao)
+    {
+        $flag = 0;
+
+        if ($solicitacao == 1) {
+            $flag = 3;
+        }else{
+            $flag = 4;
+        }
+
+        self::criarSolicitacao($solicitacao);
+
+        sleep(6);
+        
+        if (self::checkSolicitacao($estacao) == 0) {
+            self::insereFlag($flag,$solicitacao);
+            return 0;
         }
         
-         //Checagem de solicitação aberta
-        $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null or FLAG_ERRO is not null;";
-        
-        $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
-        
-        $contagem = $result_solicitacao->num_rows;
-        
-        
-        //Solicitação não pode ser feita e sai da função
-        if ($contagem != 0) {
-            echo "ERRO NO SERVIDOR, CONTATE ADMINISTADOR";
-            return -2;
-        }
+    }
+    
+    public function criarSolicitacao($tipo_solicitacao)
+    {
+        $instanciaConnection = self::instanciaConnection();
         
         $solicitacao = "insert into SOLICITACAO 
                             (DATA_ABERTURA, 
@@ -393,33 +371,54 @@ class Usuario
                              VALUES
                              (SYSDATE(),
                               1,
-                              2)";
+                              '$tipo_solicitacao')";
         
         $instanciaConnection->executaQuery($solicitacao);
+    }
+
+    public function checkSolicitacao($estacao)
+    {
+        $instanciaConnection = self::instanciaConnection();
         
-        //Tempo para Arduiino verificar se ha liberacao    
-        sleep(10);
-            
         $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
-            
+        
         $id_estacao = $instanciaConnection->listData($query_busca);
-            
-        if (self::checkVaga($senha) == 2) {
-                
-            $query_insert = "update USUARIO_ESTACAO set 
-                                HORA_FIM = SYSDATE()
-                                where HORA_FIM is null
-                                and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
-                
-                $instanciaConnection->executaQuery($query_insert);
-                
-                echo "Vaga liberada para novo uso, pode retirar a bike";
-                
-            } else {
-                echo "Nada a fazer";
-            }
+        
+        $query_id_max_solicitacao = "select max(idSOLICITACAO) as maxid from SOLICITACAO;";
+        
+        $result_solicitacao = $instanciaConnection->listData($query_id_max_solicitacao);
+        
+        while ($row = mysqli_fetch_array($result_solicitacao)) {
+            $max_id_solicitacao = $row['maxid'];
+        }
+
+        echo "MAX ID FOI: " . $max_id_solicitacao;
+        
+        $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is not null and idSOLICITACAO = '$max_id_solicitacao';";
+        
+        $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
+        
+        return $result_solicitacao->num_rows;
+        
     }
     
+    public function insereFlag($flag,$id_tipo)
+    {
+        $instanciaConnection = self::instanciaConnection();
+        
+        $query_insert = "update `server_bike`.`SOLICITACAO` 
+                                    set DATA_FECHAMENTO = SYSDATE(),
+                                    FLAG_ERRO = '$flag',
+                                    id_tipo = '$id_tipo'
+                                    where DATA_FECHAMENTO is null;";
+        
+        
+        $instanciaConnection->executaQuery($query_insert);
+        
+        echo 'Solicitacao nao atendida pelo arduino';
+    }
+
+
     public static function checkVaga($senha)
     {
         
@@ -437,25 +436,25 @@ class Usuario
             //Vaga pode ser utilizada de acordo com o BANCO na tabela USUAARIO_ESTACAO
             return 1;
         } else {
-
-        // TEM VAGA OCUPADA POR MIM?
-        $query_consulta_usuario_estacao = "select * from USUARIO_ESTACAO 
+            
+            // TEM VAGA OCUPADA POR MIM?
+            $query_consulta_usuario_estacao = "select * from USUARIO_ESTACAO 
                                             where HORA_FIM is NULL 
                                             and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
-
-        $se_ocupado = $instanciaConnection->listData($query_consulta_usuario_estacao);
-
-        $contagem = $se_ocupado->num_rows;
-        
-        //Há HORA_FIM null, estação ocupada
-        if ($contagem != 0) {
-            echo "vaga usada por voce";
-            return 2;
-        }
-
+            
+            $se_ocupado = $instanciaConnection->listData($query_consulta_usuario_estacao);
+            
+            $contagem = $se_ocupado->num_rows;
+            
+            //Há HORA_FIM null, estação ocupada
+            if ($contagem != 0) {
+                echo "vaga usada por voce";
+                return 2;
+            }
+            
             return 0;
-        } 
-
+        }
+        
     }
     
 }
@@ -594,4 +593,3 @@ class ArduinoDao{
 }
 
 ?>
-
