@@ -42,7 +42,7 @@ switch ($numero_funcao) {
         $estacao       = $_POST['estacao'];
         $senha_usuario = $_POST['senha'];
         
-        $usuario->retirar_bike($senha_usuario, $estacao);
+        $usuario->habilitar_vaga($senha_usuario, $estacao);
         break;
     case "5":
         $email = $_GET['email'];
@@ -282,12 +282,23 @@ class Usuario
             return -2;
         }
         
-        if (self::checkVaga($senha) == 1) {
+        $retornoCheckVaga = self::checkVaga($senha);
+
+        if ($retornoCheckVaga== 0) {
             
-            self::acionaArduino($estacao, 1);
+            echo "Nada a fazer";
+
+            return 0;
+        }
 
             self::acionaArduino($estacao, 2);
-            
+            self::acionaArduino($estacao, 1);
+
+        if ($retornoCheckVaga == 1) {
+                   // self::acionaArduino($estacao, 1);
+
+     
+
             
             $query_insert = "insert into USUARIO_ESTACAO
                                 (USUARIO_ID_USUARIO,
@@ -306,12 +317,21 @@ class Usuario
             $instanciaConnection->executaQuery($query_insert);
 
 
-            
-            
             echo "Solicitacao de acesso aprovada";
             
-        } else {
-            echo "Essa vaga está ocupada!";
+        } 
+
+        if ($retornoCheckVaga == 2) {
+             //  self::acionaArduino($estacao, 2);
+
+            $query_insert = "update USUARIO_ESTACAO set 
+                                HORA_FIM = SYSDATE()
+                                where HORA_FIM is null
+                                and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
+            
+            $instanciaConnection->executaQuery($query_insert);
+            
+            echo "Vaga liberada para novo uso, pode retirar a bike";
         }
         
     }
@@ -331,7 +351,7 @@ class Usuario
 
         self::criarSolicitacao($solicitacao);
 
-        sleep(10);
+        sleep(6);
         
         if (self::checkSolicitacao($estacao) == 0) {
             self::insereFlag($flag,$solicitacao);
@@ -398,66 +418,7 @@ class Usuario
         echo 'Solicitacao nao atendida pelo arduino';
     }
 
-    public function retirar_bike($senha, $estacao)
-    {
-        
-        $instanciaConnection = self::instanciaConnection();
-        
-        $userDao = new UsuarioDao();
-        
-        if ($userDao->checkLoginHash($senha) == 0) {
-            echo "Liberação não autorizada: Senha não reconhecida";
-            return -1;
-        }
-        
-        //Checagem de solicitação aberta
-        $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null or FLAG_ERRO is not null;";
-        
-        $result_solicitacao = $instanciaConnection->listData($query_solicitacao);
-        
-        $contagem = $result_solicitacao->num_rows;
-        
-        
-        //Solicitação não pode ser feita e sai da função
-        if ($contagem != 0) {
-            echo "ERRO NO SERVIDOR, CONTATE ADMINISTADOR";
-            return -2;
-        }
-        
-        $solicitacao = "insert into SOLICITACAO 
-                            (DATA_ABERTURA, 
-                             ID_ARDUINO,
-                             ID_TIPO)
-                             VALUES
-                             (SYSDATE(),
-                              1,
-                              2)";
-        
-        $instanciaConnection->executaQuery($solicitacao);
-        
-        //Tempo para Arduiino verificar se ha liberacao    
-        sleep(10);
-        
-        $query_busca = "select ID_ESTACAO from ESTACAO where NOME like '$estacao';";
-        
-        $id_estacao = $instanciaConnection->listData($query_busca);
-        
-        if (self::checkVaga($senha) == 2) {
-            
-            $query_insert = "update USUARIO_ESTACAO set 
-                                HORA_FIM = SYSDATE()
-                                where HORA_FIM is null
-                                and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
-            
-            $instanciaConnection->executaQuery($query_insert);
-            
-            echo "Vaga liberada para novo uso, pode retirar a bike";
-            
-        } else {
-            echo "Nada a fazer";
-        }
-    }
-    
+
     public static function checkVaga($senha)
     {
         
@@ -632,4 +593,3 @@ class ArduinoDao{
 }
 
 ?>
-
