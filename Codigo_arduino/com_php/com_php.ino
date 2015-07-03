@@ -82,16 +82,17 @@ void loop()
     if (flag == FUNC6_SOLICITACAO_FALSE) // nao roda funcao 7
       Serial.println(F("Nao ha solicitacao "));
     else {
+
       if (flag == FUNC6_SOLICITACAO_LIBERAR) {// Liberar energia
         sprintf(params, "numerofuncao=7&tranca=1&flag=0");
         acionamentosLOW();
-        
+
       }
 
       if (flag == FUNC6_SOLICITACAO_CORTAR) { // Fechar energia
         sprintf(params, "numerofuncao=7&tranca=2&flag=0");
         acionamentosHIGH();
-        
+
 
       }
       flag = postPage(serverName, serverPort, pageName, params); // POST no servidor
@@ -104,12 +105,12 @@ void loop()
           sprintf(out_msg, "Falha ao liberar %s", params);
 
         sprintf(out_msg, "Finalizado funcao 7 %s", params);
-
-        
       */
-       controleTomada();
-       Serial.println("\n------Solicitacao Processada ------\n");
-       
+      controleTomada();
+
+      Serial.println("\n------Dados ------\n");
+
+      Serial.println("\n------Solicitacao Processada ------\n");
     }
 
     Serial.println(out_msg);
@@ -118,6 +119,8 @@ void loop()
     Serial.println();
     Serial.println(totalCount, DEC);
     Serial.println("Disconnecting");
+
+    setSolLast();
   }
 }
 
@@ -222,7 +225,7 @@ void setupEnergia() {
   // digitalWrite(sensor, HIGH);
   Serial.println("rodei setup energia");
   acionamentoEnergiaLOW();
-  
+
 
 }
 
@@ -230,13 +233,13 @@ void setupEnergia() {
 
 void controleTomada() {
 
+  setSolLast();
+
   if (solenoide_current > solenoide_last) {
     if (estado_energia == 0)
     {
       estado_energia = 1;
-    }
-
-    if (estado_energia == 1)
+    } else     if (estado_energia == 1)
     {
       estado_energia = 0;
     }
@@ -245,37 +248,28 @@ void controleTomada() {
 
   if (estado_energia == 0 )
   {
-    acionamentoEnergiaHIGH();
-
-  } else {
     acionamentoEnergiaLOW();
+    Serial.println("acionamentoEnergiaHIGH");
+  } else {
+    acionamentoEnergiaHIGH();
+    Serial.println("acionamentoEnergiaLOW");
   }
 
+  solenoide_current = solenoide_last;
 }
 
-void setSolLast(){
+void setSolLast() {
   solenoide_last = digitalRead(sol);
 }
 
-void setSolCurr(){
+void setSolCurr() {
   solenoide_current = digitalRead(sol);
 }
 
-
-void printEnergia(){
-  Serial.println("rodei ControleTomada energia");
-  Serial.println(estado_energia);
-}
-
-
 void acionamentoEnergiaLOW() {
-  setSolLast();
   digitalWrite(energia, LOW);
-  setSolCurr();
 }
 
 void acionamentoEnergiaHIGH() {
-   setSolLast();
   digitalWrite(energia, HIGH);
-  setSolCurr();
 }
