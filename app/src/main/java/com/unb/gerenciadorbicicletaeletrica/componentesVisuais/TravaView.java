@@ -78,6 +78,8 @@ public class TravaView  extends RelativeLayout {
     }
 
     public void setLock(boolean lock) {
+        if (lock)((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_fechado);
+        else ((ImageButton) btn_trava).setImageResource(R.drawable.cadeado_aberto);
         this.lock = lock;
 
     }

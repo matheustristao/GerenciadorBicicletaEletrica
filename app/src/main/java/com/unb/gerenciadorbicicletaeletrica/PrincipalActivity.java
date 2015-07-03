@@ -1,9 +1,11 @@
 package com.unb.gerenciadorbicicletaeletrica;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -37,6 +40,9 @@ import android.app.FragmentManager;
 //Animacoes
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Ramon on 5/16/15.
@@ -72,7 +78,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
     private Marker markerMaps;//Marcador no mapa
 
     private boolean podeUsarCadeado; //Variavel utilizada para amarrar a visualizacao
-
+    private boolean requisicaoAssincronaAtivada;
+    Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -84,6 +91,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         upperToolBar = (Toolbar) findViewById(R.id.tb_main);
         upperToolBar.inflateMenu(R.menu.menu_main);
         podeUsarCadeado =false;
+        requisicaoAssincronaAtivada=false;
 
         upperToolBar.setOnMenuItemClickListener(
                 new Toolbar.OnMenuItemClickListener() {
@@ -100,6 +108,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                             popViews();
                             logado=null;
                             solicitaLogin(getBaseContext());
+                            if(timer!=null)paraAtualizacaoValorCorrente();
 
                         }
                         if(id==R.id.satelite)
@@ -113,6 +122,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                         if(id==R.id.hibrido)
                         {
                             map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                            verificaVaga(email_logado);
+
                         }
 
                         return true;
@@ -122,10 +133,9 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         solicitaLogin(this);
 
 
-//     configuraEventosToolbarBottom(this);
-//        logado="ramon";
-
-
+     configuraEventosToolbarBottom(this);
+        logado="ramon";
+        podeUsarCadeado=true;
 
     }
 
@@ -139,7 +149,6 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
-
         loginView = new LoginView(context);
         loginView.setLayoutParams(params);
         loginView.setY(110);
@@ -149,7 +158,6 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
         loginView.setBtn_enviar(btn_enviar);
         loginView.setBtn_cadastrar(btn_novoCadastro);
-
 
         btn_enviar.setOnClickListener(new View.OnClickListener() {
 
@@ -161,7 +169,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 //
 //                configuraEventosToolbarBottom(context);
 
-                new Thread() {
+                new Thread()
+                {
                     public void run() {
 
                         EditText etemail = loginView.getTf_email();
@@ -178,10 +187,19 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                             runOnUiThread(new Runnable() {
                                 public void run() {
 
-                                    popViews();
-                                    addMap();
-                                    configuraEventosToolbarBottom(context);
+                                    try
+                                        {
 
+                                             popViews();
+                                             addMap();
+                                             configuraEventosToolbarBottom(context);
+
+                                              //Inicializa atualizacao assincrona do valor da corrente
+                                             if(!requisicaoAssincronaAtivada) atualizaValorCorrente();
+                                        }catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
                                 }
                             });
                             usuario=conectionFactory.getDadosUsuarioHttp(email_logado);
@@ -309,8 +327,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         infoView.setLayoutParams(params);
         infoView.addInfo(usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getCorrente());
 
-        //  infoView.addInfo(response.getNome(),response.getEmail(),response.getTelefone());
-
+        CorrenteAsync corrente = new CorrenteAsync();
+        corrente.execute();
 
         this.runOnUiThread(new Runnable() {
 
@@ -339,12 +357,16 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
             if(travaView==null) travaView=new TravaView(context);
 
 
+            String teste = conectionFactory.verificaVagaHttp(email_logado);
+            Toast.makeText(getBaseContext(),"QTD Vagas:"+teste,Toast.LENGTH_SHORT).show();
+
             travaView.setLayoutParams(params);
             travaView.getBtn_trava().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-                    validarSenha();
+
+                  validarSenha();
 
                 }
             });
@@ -375,10 +397,6 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                     });
             alertDialog.show();
         }
-
-
-
-
 
     }
     private void bloqueiaEventosToolbarBottom(final  Context context)
@@ -429,6 +447,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
         rlayout=(RelativeLayout) findViewById(R.id.layoutPrincipal);
         params=new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//Essa linha vai dar merda
 
+
+
         //Botao Tranca
         mToolBarBottom.findViewById(R.id.toolBtn_1).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -471,6 +491,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                     popViews();
 
                     informacoes(context);
+
 
                 }catch (Exception e)
                 {
@@ -524,8 +545,6 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                 removeMap();
             }
         });
-
-
 
     }
     @Override
@@ -588,18 +607,7 @@ private void removeMap()
     upperToolBar.getMenu().findItem(R.id.satelite).setVisible(false);
     upperToolBar.getMenu().findItem(R.id.hibrido).setVisible(false);
 }
-//Inner Class
 
-private class CadastroAsync extends AsyncTask<String,Void,String>
-    {
-
-        @Override
-        protected String doInBackground(String... params) {
-
-
-            return null;
-        }
-    }
 
 
 private String validarSenha() {
@@ -629,14 +637,16 @@ private String validarSenha() {
                 try{
 
 
-                    new Thread() {
+                    new Thread()
+                    {
                         public void run() {
 
                             final String hashSenha = Util.computeSHAHash(email_logado,senhaUsuario);
 
                             logado = conectionFactory.loginHttp(email_logado, hashSenha);
 
-                            if (logado.equals("loguei")) {
+                             if (logado.equals("loguei")) {
+
 
                                 runOnUiThread(new Runnable() {
                                     public void run() {
@@ -646,16 +656,16 @@ private String validarSenha() {
 
                                         if(travaView.isLock())
                                         {
-                                            travaView.retirarBike(usuario.getEmail(),senhaUsuario,"piloto");
-//                                            Toast.makeText(getBaseContext(),"1-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                                            travaView.retirarBike(email_logado,senhaUsuario,"piloto");
+                                           Toast.makeText(getBaseContext(),"Aberto"+travaView.isLock(),Toast.LENGTH_SHORT).show();
                                             YoYo.with(Techniques.Pulse)
                                                     .duration(800)
                                                     .playOn(travaView);
                                             travaView.changeLock();
                                         }else
                                         {
-                                            travaView.habilitarTrava(usuario.getEmail(),senhaUsuario,"piloto");
-//                                            Toast.makeText(getBaseContext(),"2-->"+travaView.isLock(),Toast.LENGTH_SHORT).show();
+                                            travaView.habilitarTrava(email_logado,senhaUsuario,"piloto");
+                                            Toast.makeText(getBaseContext(),"Fechado"+travaView.isLock(),Toast.LENGTH_SHORT).show();
                                             YoYo.with(Techniques.Pulse)
                                                     .duration(800)
                                                     .playOn(travaView);
@@ -684,9 +694,6 @@ private String validarSenha() {
 
                     }.start();
 
-
-
-
                 }catch (Exception e)
                 {
 
@@ -707,8 +714,11 @@ private String validarSenha() {
         alert = builder.create();
         //Exibe
         alert.show();
+
         return senhaUsuario;
     }
+
+
 
 
     @Override
@@ -746,6 +756,204 @@ private String validarSenha() {
         return true;
     }
 
+public void paraAtualizacaoValorCorrente()
+{
+   timer.cancel();
+}
+public void atualizaValorCorrente() {
+        final Handler handler = new Handler();
+        timer = new Timer();
+        TimerTask  doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run()
+            {
+                boolean post = handler.post(new Runnable() {
+                    public void run() {
+                              try
+                                  {
+                                       CorrenteAsync corrente=new CorrenteAsync();
+                                        corrente.execute();
+                                  } catch (Exception e)
+                                  {
 
+                                  }
+                    }
+                });
+            }
+
+        };
+
+        timer.schedule(doAsynchronousTask, 0, 5000);
+
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onStop();
+        if(timer!=null)
+        paraAtualizacaoValorCorrente();
+    }
+    @Override
+   public void onStop()
+   {
+       super.onStop();
+       if(timer!=null)
+           paraAtualizacaoValorCorrente();
+   }
+
+
+    private void verificaVaga(String email)
+    {
+         final String respost=conectionFactory.verificaVagaHttp(email_logado);
+
+        new Thread()
+        {
+            public void run() {
+
+                final String respost=conectionFactory.verificaVagaHttp(email_logado);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+
+                            try
+                            {
+                                Toast.makeText(getBaseContext(),"Resposta "+respost,Toast.LENGTH_SHORT).show();
+
+                            }catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+
+
+            }
+
+        }.start();
+    }
+    //Inner Class
+
+private class QtdVagaTask extends  AsyncTask<String,Void,String> {
+
+
+    @Override
+    protected String doInBackground(String... strings) {
+
+
+        try
+        {
+            
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    protected void onPostExecute(String result) {
+
+    }
+}
+
+    private class DelayCadeado extends AsyncTask<Void,Void,Void>
+    {
+
+        private AlertDialog dialog;
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+
+
+
+        try {
+            Toast.makeText(getBaseContext(),"Delay Inicio",Toast.LENGTH_SHORT).show();
+
+//               dialog= new AlertDialog.Builder(getBaseContext()).create();
+//
+//            dialog.setTitle("Trava");
+//            dialog.setMessage("Aguarde enquanto processamos a informação");
+//            dialog.show();
+//               this.wait(7000);
+//                Thread.sleep(5000);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(String result)
+        {
+
+            try
+            {
+                Toast.makeText(getBaseContext(),"Delay Fim",Toast.LENGTH_SHORT).show();
+                  dialog.dismiss();
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+
+        }
+
+
+    }
+    private class CorrenteAsync extends AsyncTask<Void,Void,String>
+    {
+
+
+        @Override
+        protected String doInBackground(Void... voids)
+        {
+            String correnteValor = null;
+            try {
+
+                correnteValor=conectionFactory.getDadosUsuarioHttp(email_logado).getCorrente();
+//                Toast.makeText(getBaseContext(),"AsyncTask background "+correnteValor,Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return correnteValor;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try
+            {
+                if(email_logado!=null)
+                {
+//                    Toast.makeText(getBaseContext(),"AsyncTask PosExecute->"+result,Toast.LENGTH_SHORT).show();
+                }    infoView.addInfo(usuario.getNome(),usuario.getEmail(),usuario.getTelefone(),result);
+            }catch (Exception e)
+            {
+
+            }
+
+
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

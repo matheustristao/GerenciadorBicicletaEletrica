@@ -29,7 +29,7 @@ public class ConectionFactory {
     private String numero_funcao, numero_funcao_get;
 
 
-    private  final static String ENDERECO_SERVER = "http://192.168.1.4/xampp/server_bike/server.php";
+    private  final static String ENDERECO_SERVER = "http://192.168.1.166/xampp/server_bike/server.php";
 
     private String _email;
 
@@ -140,7 +140,38 @@ public class ConectionFactory {
         return mensagem;
     }
 
+    public String verificaVagaHttp(String email)
+    {
+        String mensagem = null;
+        numero_funcao = "9";
+        _email = email;
 
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(ENDERECO_SERVER);
+        try {
+            ArrayList<NameValuePair> valores = new ArrayList<NameValuePair>();
+
+            valores.add(new BasicNameValuePair("email", email));
+            valores.add(new BasicNameValuePair("numerofuncao", numero_funcao));
+
+            httpPost.setEntity(new UrlEncodedFormEntity(valores));
+
+            final HttpResponse resposta = httpClient.execute(httpPost);
+
+            mensagem = EntityUtils.toString(resposta.getEntity());
+
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return mensagem;
+    }
 
     public Usuario getDadosUsuarioHttp(String email) {
 
