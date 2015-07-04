@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,6 +86,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
     static final String VAGA_OCUPADA_PELO_USUARIO="2";
     static final String VAGA_INDISPONIVEL="0";
 
+    private boolean bloquearInteracoesComUsuario = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -142,6 +145,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 //     configuraEventosToolbarBottom(this);
 //        logado="ramon";
 //        podeUsarCadeado=true;
+//        situacaoVagas=VAGA_DISPONIVEL;
 
     }
 
@@ -617,8 +621,6 @@ private void addMap()
     map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
     mMapFragment.getView().setVisibility(View.VISIBLE);
 
-
-
 //Mostra opcoes de mapa no menu
     upperToolBar.getMenu().findItem(R.id.mapa).setVisible(true);
     upperToolBar.getMenu().findItem(R.id.satelite).setVisible(true);
@@ -657,6 +659,7 @@ private void removeMap()
 private String validarSenha() {
 
 
+        final PrincipalActivity context=this;
         final EditText[] edit = {null};
         //Cria o gerador do AlertDialog
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -680,6 +683,13 @@ private String validarSenha() {
 
                 try{
 
+                    AlertDialog alert= new AlertDialog.Builder(context).create();
+                    alert.setTitle("Aviso");
+                    alert.setMessage("Por favor aguarde...");
+                    alert.show();
+
+                    DelayCadeado delay = new DelayCadeado();
+                    delay.execute(alert);
 
                     new Thread()
                     {
@@ -826,6 +836,14 @@ private String validarSenha() {
         return true;
     }
 
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (bloquearInteracoesComUsuario) {
+            return true;
+        } else {
+            return super.dispatchTouchEvent(ev);
+        }
+    }
+
 public void paraAtualizacaoValorCorrente()
 {
    timer.cancel();
@@ -857,6 +875,7 @@ public void atualizaValorCorrente() {
         };
 
         timer.schedule(doAsynchronousTask, 0, 5000);
+
 
     }
 
@@ -945,41 +964,33 @@ private class QtdVagaTask extends  AsyncTask<Void,Void,String> {
     }
 }
 
-    private class DelayCadeado extends AsyncTask<Void,Void,Void>
+private class DelayCadeado extends AsyncTask<AlertDialog,Void,AlertDialog>
     {
 
-        private AlertDialog dialog;
+        private AlertDialog[] dialog;
+
         @Override
-        protected Void doInBackground(Void... voids) {
-
-
-
-
-        try {
-            Toast.makeText(getBaseContext(),"Delay Inicio",Toast.LENGTH_SHORT).show();
-
-//               dialog= new AlertDialog.Builder(getBaseContext()).create();
-//
-//            dialog.setTitle("Trava");
-//            dialog.setMessage("Aguarde enquanto processamos a informação");
-//            dialog.show();
-//               this.wait(7000);
-//                Thread.sleep(5000);
-
-            } catch (Exception e) {
+        protected AlertDialog doInBackground(AlertDialog... alertDialogs) {
+            dialog=alertDialogs;
+            try {
+                bloquearInteracoesComUsuario =true;
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            return null;
+            return dialog[0];
         }
 
-        protected void onPostExecute(String result)
+
+
+      protected void onPostExecute(AlertDialog result)
         {
 
             try
             {
-                Toast.makeText(getBaseContext(),"Delay Fim",Toast.LENGTH_SHORT).show();
-                  dialog.dismiss();
+                bloquearInteracoesComUsuario =false;
+                result.dismiss();
+
             }catch (Exception e)
             {
                 e.printStackTrace();
