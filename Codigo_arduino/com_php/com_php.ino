@@ -8,26 +8,15 @@
 
 #include <SPI.h>
 #include <Ethernet.h>
+#include <EmonLib.h>  
 
-byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
-// var Solenoide
-int sensor = 3;
-int leitura = 0;
-
-int solenoide_current = 0;
-int solenoide_last = 0;
-
-int estado_energia = 0;
-
-//Change to your server domain
+// domínio do servidor
 char serverName[] = "192.168.1.166";
 
-// change to your server's port
+// porta do servidor
 int serverPort = 80;
 
-// change to the page on that server
+// Pagina web a ser acessada do servidor
 char pageName[] = "/xampp/server_bike/server.php";
 
 EthernetClient client;
@@ -35,13 +24,28 @@ int totalCount = 0;
 // insure params is big enough to hold your variables
 char params[32];
 
-// set this to the number of milliseconds delay
-// this is 30 seconds
+// delay de carregamento
 #define delayMillis 2000UL
 
 unsigned long thisMillis = 0;
 unsigned long lastMillis = 0;
 
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+
+//var bateria
+EnergyMonitor emon1;
+ 
+//Tensao da rede eletrica
+int rede = 220.0; 
+int pino_sct =A0; //Pino do sensor SCT
+
+
+// var Solenoide
+int solenoide_current = 0;
+int solenoide_last = 0;
+int estado_energia = 0;
 
 
 void setup() {
@@ -60,6 +64,7 @@ void setup() {
 
   setupSolenoide();
   setupEnergia();
+  setupDadosBateria();
 
 }
 
@@ -120,6 +125,10 @@ void loop()
     Serial.println(totalCount, DEC);
     Serial.println("Disconnecting");
 
+    // envia o valor da bateria para o servidor
+    mostraValorBateria();
+
+    // seta ultimo valor do solenoide
     setSolLast();
   }
 }
@@ -273,3 +282,27 @@ void acionamentoEnergiaLOW() {
 void acionamentoEnergiaHIGH() {
   digitalWrite(energia, HIGH);
 }
+
+
+
+void mostraValorBateria() 
+{ 
+
+  double Irms = emon1.calcIrms(1480);
+
+  client.println(Irms,3);
+
+  // Serial.print("Corrente : ");  //Mostra o valor da corrente
+  Serial.print(Irms,3); // Irms
+  // Serial.print(" Tensao : ");
+  Serial.print(rede);     
+  // Serial.print(" Potencia : ");
+  Serial.println(Irms*rede);
+  
+}  
+  
+void setupDadosBateria(){
+  //Pino, calibracao - Cur Const= Ratio/BurdenR. 1800/62 = 29. 
+  emon1.current(pino_sct, 40.1);//111.1 para 110 volts
+}
+
