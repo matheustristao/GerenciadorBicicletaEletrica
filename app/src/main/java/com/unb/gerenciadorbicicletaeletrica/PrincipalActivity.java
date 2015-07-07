@@ -214,7 +214,7 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
                             });
                             usuario=conectionFactory.getDadosUsuarioHttp(email_logado);
 
-                              Log.e("teste bateria", usuario.getCorrente());
+                              // Log.e("teste bateria", usuario.getCorrente());
 
                         } else {
                             runOnUiThread(new Runnable() {
@@ -974,7 +974,7 @@ private class DelayCadeado extends AsyncTask<AlertDialog,Void,AlertDialog>
             dialog=alertDialogs;
             try {
                 bloquearInteracoesComUsuario =true;
-                Thread.sleep(5000);
+                Thread.sleep(6000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
