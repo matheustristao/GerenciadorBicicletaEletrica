@@ -65,14 +65,14 @@ switch ($numero_funcao) {
         break;
     
     case "8":
-        $corrente = $_POST['corrente'];
-        $ArduinoDao->insereDados($corrente);
+        
+        $ArduinoDao->insereDados($_POST['corrente']);
         break;
     
     case "9":
         $usuario->checkVaga($_POST['email'], 2);
         break;
-        
+    
         
 }
 
@@ -295,7 +295,7 @@ class Usuario
         }
         
         self::acionaArduino($estacao, 2);
-        self::acionaArduino($estacao, 1);
+         self::acionaArduino($estacao, 1);
         
         if ($retornoCheckVaga == 1) {
             // self::acionaArduino($estacao, 1);
@@ -598,7 +598,7 @@ class ArduinoDao
         
         $instanciaConnection->executaQuery($query);
         
-        echo "Dados da corrente inseridos com sucesso";
+        echo "@1";
         
     }
     

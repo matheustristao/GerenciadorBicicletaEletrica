@@ -8,10 +8,10 @@
 
 #include <SPI.h>
 #include <Ethernet.h>
-#include <EmonLib.h>  
+#include <EmonLib.h>
 
 // domínio do servidor
-char serverName[] = "192.168.1.166";
+char serverName[] = "192.168.1.5";
 
 // porta do servidor
 int serverPort = 80;
@@ -36,10 +36,10 @@ byte mac[] = {
 
 //var bateria
 EnergyMonitor emon1;
- 
+
 //Tensao da rede eletrica
-int rede = 220.0; 
-int pino_sct =A0; //Pino do sensor SCT
+int rede = 220.0;
+int pino_sct = A0; //Pino do sensor SCT
 
 
 // var Solenoide
@@ -125,8 +125,9 @@ void loop()
     Serial.println(totalCount, DEC);
     Serial.println("Disconnecting");
 
-    // envia o valor da bateria para o servidor
-    mostraValorBateria();
+     // Envia dados da bateria para o servidor
+    sprintf(params, "numerofuncao=8&corrente=%d", mostraValorBateria());
+    postPage(serverName, serverPort, pageName, params);
 
     // seta ultimo valor do solenoide
     setSolLast();
@@ -155,6 +156,7 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
 
     // send the body (variables)
     client.print(thisData);
+    
 
   }
   else
@@ -283,26 +285,15 @@ void acionamentoEnergiaHIGH() {
   digitalWrite(energia, HIGH);
 }
 
+int mostraValorBateria()
+{
 
-
-void mostraValorBateria() 
-{ 
-
-  double Irms = emon1.calcIrms(1480);
-
-  client.println(Irms,3);
-
-  // Serial.print("Corrente : ");  //Mostra o valor da corrente
-  Serial.print(Irms,3); // Irms
-  // Serial.print(" Tensao : ");
-  Serial.print(rede);     
-  // Serial.print(" Potencia : ");
-  Serial.println(Irms*rede);
+  int result = emon1.calcIrms(1480) * 1000;
   
-}  
-  
-void setupDadosBateria(){
-  //Pino, calibracao - Cur Const= Ratio/BurdenR. 1800/62 = 29. 
-  emon1.current(pino_sct, 40.1);//111.1 para 110 volts
+  return result;
 }
 
+void setupDadosBateria() {
+  //Pino, calibracao - Cur Const= Ratio/BurdenR. 1800/62 = 29.
+  emon1.current(pino_sct, 64);//111.1 para 110 volts
+}
