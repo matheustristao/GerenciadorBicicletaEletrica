@@ -46,7 +46,7 @@ public class DataView extends RelativeLayout {
         this.getTv_telefone().setY(this.getTv_email().getY() + 50);
 
         this.setTv_corrente(new TextView(context));
-        this.getTv_corrente().setText("Corrente:");
+        this.getTv_corrente().setText("Porcentagem:");
         this.getTv_corrente().setTextSize(25);
         this.getTv_corrente().setLayoutParams(alinhamento);
         this.getTv_corrente().setTextColor(Color.BLACK);
