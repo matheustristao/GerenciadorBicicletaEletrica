@@ -1,29 +1,24 @@
-#define sol 3 //Define Lamp como 7
-
-
+#define sol 3 //Define Lamp como 3
+#define energia 7 //Define energia pin como 7
 #define FUNC6_SOLICITACAO_LIBERAR  1
 #define FUNC6_SOLICITACAO_CORTAR  2
 #define FUNC6_SOLICITACAO_FALSE 0
 #define FALHA_FUNC7_LIBERAR -1
 #define FALHA_FUNC7_CORTAR -2
+#define BATTERY_ZERO_TEORICO 200
+#define BATTERY_FULL_RAZAO 30
 
 #include <SPI.h>
 #include <Ethernet.h>
+#include <EmonLib.h>
 
-byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
-// var Solenoide
-int sensor = 3;
-int leitura = 0;
+// domínio do servidor
+char serverName[] = "192.168.1.5";
 
-//Change to your server domain
-char serverName[] = "192.168.1.3";
-
-// change to your server's port
+// porta do servidor
 int serverPort = 80;
 
-// change to the page on that server
+// Pagina web a ser acessada do servidor
 char pageName[] = "/xampp/server_bike/server.php";
 
 EthernetClient client;
@@ -31,12 +26,29 @@ int totalCount = 0;
 // insure params is big enough to hold your variables
 char params[32];
 
-// set this to the number of milliseconds delay
-// this is 30 seconds
-#define delayMillis 3000UL
+// delay de carregamento
+#define delayMillis 2000UL
 
 unsigned long thisMillis = 0;
 unsigned long lastMillis = 0;
+
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+
+//var bateria
+EnergyMonitor emon1;
+
+//Tensao da rede eletrica
+int rede = 220.0;
+int pino_sct = A0; //Pino do sensor SCT
+
+
+// var Solenoide
+int solenoide_current = 0;
+int solenoide_last = 0;
+int estado_energia = 0;
+
 
 void setup() {
   Serial.begin(9600);
@@ -53,8 +65,10 @@ void setup() {
   Serial.println(F("Ready"));
 
   setupSolenoide();
-}
+  setupEnergia();
+  setupDadosBateria();
 
+}
 
 void loop()
 {
@@ -63,7 +77,7 @@ void loop()
   Ethernet.maintain();
 
   thisMillis = millis();
-  
+
   if (thisMillis - lastMillis > delayMillis)
   {
     lastMillis = thisMillis;
@@ -75,26 +89,35 @@ void loop()
     if (flag == FUNC6_SOLICITACAO_FALSE) // nao roda funcao 7
       Serial.println(F("Nao ha solicitacao "));
     else {
+
       if (flag == FUNC6_SOLICITACAO_LIBERAR) {// Liberar energia
         sprintf(params, "numerofuncao=7&tranca=1&flag=0");
-       acionamentosLOW();
+        acionamentosLOW();
+
       }
 
       if (flag == FUNC6_SOLICITACAO_CORTAR) { // Fechar energia
-        sprintf(params, "numerofuncao=7&tranca=2&flag=0");        
-         acionamentosHIGH();
-        
+        sprintf(params, "numerofuncao=7&tranca=2&flag=0");
+        acionamentosHIGH();
+
+
       }
       flag = postPage(serverName, serverPort, pageName, params); // POST no servidor
 
-      // tratando retorno
-      if (flag == FALHA_FUNC7_CORTAR)
-        sprintf(out_msg, "Falha ao cortar %s", params);
-      else if (flag == FALHA_FUNC7_LIBERAR)
-        sprintf(out_msg, "Falha ao liberar %s", params);
+      /*
+        // tratando retorno
+        if (flag == FALHA_FUNC7_CORTAR)
+          sprintf(out_msg, "Falha ao cortar %s", params);
+        else if (flag == FALHA_FUNC7_LIBERAR)
+          sprintf(out_msg, "Falha ao liberar %s", params);
 
-      sprintf(out_msg, "Finalizado funcao 7 %s", params);
-          
+        sprintf(out_msg, "Finalizado funcao 7 %s", params);
+      */
+      controleTomada();
+
+      Serial.println("\n------Dados ------\n");
+
+      Serial.println("\n------Solicitacao Processada ------\n");
     }
 
     Serial.println(out_msg);
@@ -103,9 +126,15 @@ void loop()
     Serial.println();
     Serial.println(totalCount, DEC);
     Serial.println("Disconnecting");
+
+    // Envia dados da bateria para o servidor
+    sprintf(params, "numerofuncao=8&corrente=%d", mostraValorBateria());
+    postPage(serverName, serverPort, pageName, params);
+
+    // seta ultimo valor do solenoide
+    setSolLast();
   }
 }
-
 
 byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
 {
@@ -129,6 +158,7 @@ byte postPage(char* domainBuffer, int thisPort, char* page, char* thisData)
 
     // send the body (variables)
     client.print(thisData);
+
 
   }
   else
@@ -190,12 +220,134 @@ void acionamentosLOW() {
 void acionamentosHIGH() {
 
   digitalWrite(sol, HIGH);
+
 }
 
 void setupSolenoide() {
 
-  pinMode(sol, OUTPUT); //Define o pino 7 como saída
+  pinMode(sol, OUTPUT); //Define o pino solenoide como saída
   // pinMode(sensor, INPUT);
   // digitalWrite(sensor, HIGH);
   Serial.println("rodei setup");
+}
+
+void setupEnergia() {
+
+  pinMode(energia, OUTPUT); //Define o pino energia como saída
+  // pinMode(sensor, INPUT);
+  // digitalWrite(sensor, HIGH);
+  Serial.println("rodei setup energia");
+  acionamentoEnergiaLOW();
+
+
+}
+
+
+
+void controleTomada() {
+
+  setSolLast();
+
+  if (solenoide_current > solenoide_last) {
+    if (estado_energia == 0)
+    {
+      estado_energia = 1;
+    } else     if (estado_energia == 1)
+    {
+      estado_energia = 0;
+    }
+
+  }
+
+  if (estado_energia == 0 )
+  {
+    acionamentoEnergiaLOW();
+    Serial.println("acionamentoEnergiaHIGH");
+  } else {
+    acionamentoEnergiaHIGH();
+    Serial.println("acionamentoEnergiaLOW");
+  }
+
+  solenoide_current = solenoide_last;
+}
+
+void setSolLast() {
+  solenoide_last = digitalRead(sol);
+}
+
+void setSolCurr() {
+  solenoide_current = digitalRead(sol);
+}
+
+void acionamentoEnergiaLOW() {
+  digitalWrite(energia, LOW);
+}
+
+void acionamentoEnergiaHIGH() {
+  digitalWrite(energia, HIGH);
+}
+
+int bateria_zero_medida = 0;
+int count_medida = 0;
+
+
+int mostraValorBateria()
+{
+
+  int result = emon1.calcIrms(1480) * 1000;
+
+  Serial.println(count_medida);
+
+  if (count_medida > 5  && bateria_zero_medida == 0 && result > BATTERY_ZERO_TEORICO) {
+    Serial.println("set result");
+    Serial.println(result);
+    Serial.println(bateria_zero_medida);
+    bateria_zero_medida = result;
+  }
+
+  if (result < bateria_zero_medida * BATTERY_FULL_RAZAO /100){
+    Serial.println("zerei \n\n\n----------\n\n");
+    bateria_zero_medida = 0;
+    return -1;
+  }
+
+  if (bateria_zero_medida > 0)
+  {
+    Serial.println("print result");
+    Serial.println(result);
+
+    int intervalo = bateria_zero_medida - (bateria_zero_medida * BATTERY_FULL_RAZAO / 100 );
+
+    int valor_medido_relativo = bateria_zero_medida - result;
+
+    if (valor_medido_relativo < 0)
+    {
+      return 0;
+    }
+    
+    result = valor_medido_relativo * 100 / intervalo;    
+
+    if (result > 100) {
+      result = 100;
+    }
+
+    Serial.println("result tratado");
+    Serial.println(result);
+
+    Serial.println("bateria zero medida");
+    Serial.println(bateria_zero_medida);
+    
+  } else {
+    result = 0;
+  }
+
+  count_medida++;
+
+
+  return result;
+}
+
+void setupDadosBateria() {
+  //Pino, calibracao - Cur Const= Ratio/BurdenR. 1800/62 = 29.
+  emon1.current(pino_sct, 64);//111.1 para 110 volts
 }

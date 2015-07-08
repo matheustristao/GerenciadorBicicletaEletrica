@@ -12,7 +12,7 @@ if (isset($_POST['numerofuncao'])) {
 $userDao     = new UsuarioDao();
 $usuario     = new Usuario();
 $userArduino = new Arduino();
-$ArduinoDao   = new ArduinoDao();
+$ArduinoDao  = new ArduinoDao();
 
 switch ($numero_funcao) {
     case "1":
@@ -59,18 +59,21 @@ switch ($numero_funcao) {
         //$flag   = $_GET['flag'];
         
         $tranca = $_POST['tranca'];
-        $flag  = $_POST['flag'];
-
+        $flag   = $_POST['flag'];
+        
         $userArduino->updateSolicitacao($tranca, $flag);
         break;
-
-     case "8":
-        $corrente = $_POST['corrente'];
-
     
-        $ArduinoDao->insereDados($corrente);
-     break;   
-
+    case "8":
+        
+        $ArduinoDao->insereDados($_POST['corrente']);
+        break;
+    
+    case "9":
+        $usuario->checkVaga($_POST['email'], 2);
+        break;
+    
+        
 }
 
 //Classe responsável pela conexão com o banco
@@ -122,8 +125,8 @@ class UsuarioDao
     private static function instanciaConnection()
     {
         
-       
-    self::$connection = new ConnectionFactory();
+        
+        self::$connection = new ConnectionFactory();
         
         
         return self::$connection;
@@ -208,7 +211,7 @@ class UsuarioDao
         $lista = $instanciaConnection->listData($query);
         
         $obj = $lista->fetch_object();
-        echo "{ 'Nome' : '" . $obj->NOME . "', 'Sobrenome' : '" . $obj->SOBRENOME . "', 'Email' : '" . $obj->EMAIL . "', 'Telefone' : '" . $obj->TELEFONE . "', 'Corrente' : '" . $obj->CORRENTE ."'}";
+        echo "{ 'Nome' : '" . $obj->NOME . "', 'Sobrenome' : '" . $obj->SOBRENOME . "', 'Email' : '" . $obj->EMAIL . "', 'Telefone' : '" . $obj->TELEFONE . "', 'Corrente' : '" . $obj->CORRENTE . "'}";
         
         return $obj;
     }
@@ -254,7 +257,7 @@ class Usuario
         
         return self::$connection;
     }
-
+    
     
     public function habilitar_vaga($senha, $estacao)
     {
@@ -282,23 +285,23 @@ class Usuario
             return -2;
         }
         
-        $retornoCheckVaga = self::checkVaga($senha);
-
-        if ($retornoCheckVaga== 0) {
+        $retornoCheckVaga = self::checkVaga($senha, 1);
+        
+        if ($retornoCheckVaga == 0) {
             
             echo "Nada a fazer";
-
+            
             return 0;
         }
-
-            self::acionaArduino($estacao, 2);
-            self::acionaArduino($estacao, 1);
-
+        
+        self::acionaArduino($estacao, 2);
+         self::acionaArduino($estacao, 1);
+        
         if ($retornoCheckVaga == 1) {
-                   // self::acionaArduino($estacao, 1);
-
-     
-
+            // self::acionaArduino($estacao, 1);
+            
+            
+            
             
             $query_insert = "insert into USUARIO_ESTACAO
                                 (USUARIO_ID_USUARIO,
@@ -315,15 +318,15 @@ class Usuario
                             where  USUARIO.SENHA like '$senha';";
             
             $instanciaConnection->executaQuery($query_insert);
-
-
+            
+            
             echo "Solicitacao de acesso aprovada";
             
-        } 
-
+        }
+        
         if ($retornoCheckVaga == 2) {
-             //  self::acionaArduino($estacao, 2);
-
+            //  self::acionaArduino($estacao, 2);
+            
             $query_insert = "update USUARIO_ESTACAO set 
                                 HORA_FIM = SYSDATE()
                                 where HORA_FIM is null
@@ -336,25 +339,25 @@ class Usuario
         
     }
     
-
     
-
+    
+    
     public function acionaArduino($estacao, $solicitacao)
     {
         $flag = 0;
-
+        
         if ($solicitacao == 1) {
             $flag = 3;
-        }else{
+        } else {
             $flag = 4;
         }
-
+        
         self::criarSolicitacao($solicitacao);
-
-        sleep(6);
+        
+        sleep(5);
         
         if (self::checkSolicitacao($estacao) == 0) {
-            self::insereFlag($flag,$solicitacao);
+            self::insereFlag($flag, $solicitacao);
             return 0;
         }
         
@@ -375,7 +378,7 @@ class Usuario
         
         $instanciaConnection->executaQuery($solicitacao);
     }
-
+    
     public function checkSolicitacao($estacao)
     {
         $instanciaConnection = self::instanciaConnection();
@@ -391,7 +394,7 @@ class Usuario
         while ($row = mysqli_fetch_array($result_solicitacao)) {
             $max_id_solicitacao = $row['maxid'];
         }
-
+        
         echo "MAX ID FOI: " . $max_id_solicitacao;
         
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is not null and idSOLICITACAO = '$max_id_solicitacao';";
@@ -402,7 +405,7 @@ class Usuario
         
     }
     
-    public function insereFlag($flag,$id_tipo)
+    public function insereFlag($flag, $id_tipo)
     {
         $instanciaConnection = self::instanciaConnection();
         
@@ -417,9 +420,9 @@ class Usuario
         
         echo 'Solicitacao nao atendida pelo arduino';
     }
-
-
-    public static function checkVaga($senha)
+    
+    
+    public static function checkVaga($varCmp, $param)
     {
         
         $instanciaConnection = self::instanciaConnection();
@@ -434,13 +437,21 @@ class Usuario
         
         if ($contagem == 0) {
             //Vaga pode ser utilizada de acordo com o BANCO na tabela USUAARIO_ESTACAO
+            echo "1";
             return 1;
         } else {
             
             // TEM VAGA OCUPADA POR MIM?
-            $query_consulta_usuario_estacao = "select * from USUARIO_ESTACAO 
+            if ($param == 1) {
+                $query_consulta_usuario_estacao = "select * from USUARIO_ESTACAO 
                                             where HORA_FIM is NULL 
-                                            and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$senha');";
+                                            and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where SENHA like '$varCmp');";
+            } else {
+                
+                $query_consulta_usuario_estacao = "select * from USUARIO_ESTACAO 
+                                            where HORA_FIM is NULL 
+                                            and USUARIO_ID_USUARIO = (select ID_USUARIO from USUARIO where EMAIL like '$varCmp');";
+            }
             
             $se_ocupado = $instanciaConnection->listData($query_consulta_usuario_estacao);
             
@@ -448,10 +459,11 @@ class Usuario
             
             //Há HORA_FIM null, estação ocupada
             if ($contagem != 0) {
-                echo "vaga usada por voce";
+                echo "2";
                 return 2;
             }
             
+            echo "0";
             return 0;
         }
         
@@ -475,14 +487,12 @@ class Arduino
     public function checkSolicitacao()
     {
         
-
-
         $instanciaConnection = self::instanciaConnection();
         
         $query_solicitacao = "select * from SOLICITACAO where DATA_FECHAMENTO is null;";
         
         $idtipo = $instanciaConnection->listData($query_solicitacao);
-
+        
         $contagem = $idtipo->num_rows;
         
         //Solicitação não pode ser feita e sai da função
@@ -490,18 +500,18 @@ class Arduino
             //echo "dbg: nao posso checar solicitacao: contagem=" . $contagem;
             echo "@0";
             
-
+            
             return 0;
         }
         //echo "dbg: posso checar: contagem=n" . $contagem;
-
+        
         while ($row = mysqli_fetch_array($idtipo)) {
-
-        //echo "passei idtipo= " . $row['ID_TIPO'];
-
-        echo "@" . $row['ID_TIPO'];
-         // echo "@3";  
-        return 1;
+            
+            //echo "passei idtipo= " . $row['ID_TIPO'];
+            
+            echo "@" . $row['ID_TIPO'];
+            // echo "@3";  
+            return 1;
         }
     }
     
@@ -535,7 +545,7 @@ class Arduino
             $instanciaConnection->executaQuery($query_insert);
             
             //echo "dbg: caso com flag=" . $flag;
-
+            
             echo "@-";
             
             return -1;
@@ -552,16 +562,17 @@ class Arduino
         $instanciaConnection->executaQuery($query_insert);
         //echo "dbg: atualizei SOLICITACAO tranca=" . $tranca . " flag=" . $flag;
         
-
-         echo "@1";
-
+        
+        echo "@1";
+        
         return 0;
     }
     
     
 }
 
-class ArduinoDao{
+class ArduinoDao
+{
     
     static private $connection;
     
@@ -574,22 +585,23 @@ class ArduinoDao{
         
         return self::$connection;
     }
-
-    public function insereDados($corrente){
-   
+    
+    public function insereDados($corrente)
+    {
+        
         $instanciaConnection = self::instanciaConnection();
-
+        
         $query = "insert into BATERIA (
                      CORRENTE
                     ) VALUES ( 
                      '$corrente');";
-    
+        
         $instanciaConnection->executaQuery($query);
-
-        echo "Dados da corrente inseridos com sucesso";
-  
-  }
-
+        
+        echo "@1";
+        
+    }
+    
 }
 
 ?>
