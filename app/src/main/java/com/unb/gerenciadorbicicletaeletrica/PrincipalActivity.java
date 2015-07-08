@@ -251,8 +251,8 @@ public class PrincipalActivity  extends FragmentActivity implements GoogleMap.On
 
             }
         });
-        trava(context);//apagar essa linha
-        configuraEventosToolbarBottom(context);//Apagar essa linha
+//        trava(context);//apagar essa linha
+//        configuraEventosToolbarBottom(context);//Apagar essa linha
         popViews();
         rlayout.addView(loginView);
 
